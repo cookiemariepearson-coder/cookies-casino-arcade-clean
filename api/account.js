@@ -3,24 +3,45 @@ import { supabaseAdmin } from "../lib/supabase-admin.js";
 
 async function ensureStarterCoins(userId){
   const {data:wallet,error:walletError}=await supabaseAdmin
-    .from("arcade_wallets").select("coins").eq("user_id",userId).maybeSingle();
+    .from("arcade_wallets")
+    .select("coins")
+    .eq("user_id",userId)
+    .maybeSingle();
   if(walletError)throw walletError;
 
-  const {count,error:countError}=await supabaseAdmin
+  const {data:starter,error:starterError}=await supabaseAdmin
     .from("arcade_wallet_transactions")
-    .select("id",{count:"exact",head:true})
-    .eq("user_id",userId);
-  if(countError)throw countError;
+    .select("id")
+    .eq("user_id",userId)
+    .eq("reference","starter_bonus_v1")
+    .maybeSingle();
+  if(starterError)throw starterError;
 
-  if(Number(wallet?.coins||0)===0&&Number(count||0)===0){
-    const {error}=await supabaseAdmin.rpc("apply_arcade_wallet_transaction",{
-      p_user_id:userId,
-      p_amount:10000,
-      p_type:"starter_bonus",
-      p_reference:"starter_bonus_v1",
-      p_metadata:{description:"New player starter Cookie Coins"}
-    });
-    if(error)throw error;
+  if(!starter){
+    const current=Number(wallet?.coins||0);
+    const starterAmount=Math.max(0,10000-current);
+
+    if(starterAmount>0){
+      const {error}=await supabaseAdmin.rpc("apply_arcade_wallet_transaction",{
+        p_user_id:userId,
+        p_amount:starterAmount,
+        p_type:"starter_bonus",
+        p_reference:"starter_bonus_v1",
+        p_metadata:{description:"New player starter Cookie Coins"}
+      });
+      if(error)throw error;
+    }else{
+      const {error}=await supabaseAdmin
+        .from("arcade_wallet_transactions")
+        .insert({
+          user_id:userId,
+          amount:0,
+          type:"starter_bonus",
+          reference:"starter_bonus_v1",
+          metadata:{description:"Starter balance already present"}
+        });
+      if(error&&error.code!=="23505")throw error;
+    }
   }
 }
 

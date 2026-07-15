@@ -1398,40 +1398,100 @@ button:active{transform:translateY(1px) scale(.98)}
 
 
 
+
+
+
 const STARTER_COIN_AMOUNT=10000;
 const LOW_COIN_THRESHOLD=1000;
 
 function showEntryCoinOffer(){
   if(!currentUser)return;
-  entryCoinBalance.textContent=state.coins;
+
+  const offer=document.getElementById('entryCoinOffer');
+  const balance=document.getElementById('entryCoinBalance');
+  const title=document.getElementById('entryCoinTitle');
+  const text=document.getElementById('entryCoinText');
+
+  if(!offer||!balance||!title||!text)return;
+
+  balance.textContent=Number(state.coins||0).toLocaleString();
+  const card=offer.querySelector('.entryCoinCard');
 
   if(state.coins<=0){
-    entryCoinTitle.textContent='You are out of Cookie Coins';
-    entryCoinText.textContent='Buy a coin pack to continue playing.';
-    entryCoinOffer.querySelector('.entryCoinCard').classList.add('lowCoinPulse');
+    title.textContent='You are out of Cookie Coins';
+    text.textContent='Buy a coin pack to continue playing.';
+    if(card)card.classList.add('lowCoinPulse');
   }else if(state.coins<=LOW_COIN_THRESHOLD){
-    entryCoinTitle.textContent='Your Cookie Coins are running low';
-    entryCoinText.textContent='You can keep playing, or refill now before the fun stops.';
-    entryCoinOffer.querySelector('.entryCoinCard').classList.add('lowCoinPulse');
+    title.textContent='Your Cookie Coins are running low';
+    text.textContent='Keep playing, or refill now before the fun stops.';
+    if(card)card.classList.add('lowCoinPulse');
   }else{
-    entryCoinTitle.textContent="Welcome to Cookie's Casino Arcade!";
-    entryCoinText.textContent='You have '+state.coins.toLocaleString()+' Cookie Coins. Buy more now or jump into a game.';
-    entryCoinOffer.querySelector('.entryCoinCard').classList.remove('lowCoinPulse');
+    title.textContent="Welcome to Cookie's Casino Arcade!";
+    text.textContent='You have '+Number(state.coins||0).toLocaleString()+
+      ' Cookie Coins. Buy more now or jump into a game.';
+    if(card)card.classList.remove('lowCoinPulse');
   }
 
-  entryCoinOffer.classList.add('show');
+  offer.classList.add('show');
 }
 
 function closeEntryCoinOffer(){
-  entryCoinOffer.classList.remove('show');
+  const offer=document.getElementById('entryCoinOffer');
+  if(offer)offer.classList.remove('show');
 }
 
 function checkLowCoinPrompt(){
   if(!currentUser)return;
-  if(state.coins<=LOW_COIN_THRESHOLD){
+  if(Number(state.coins||0)<=LOW_COIN_THRESHOLD){
     setTimeout(showEntryCoinOffer,550);
   }
 }
+
+function returnToEntrance(){
+  const startScreen=document.getElementById('start');
+  const appScreen=document.getElementById('app');
+
+  if(startScreen)startScreen.style.display='flex';
+  if(appScreen)appScreen.style.display='none';
+
+  closeAuthModal();
+  closeEntryCoinOffer();
+}
+
+
+/* ===== SHARED GAME GLITCH GUARDS ===== */
+const gameTimers=new Map();
+
+function setGameTimer(name,callback,delay){
+  clearGameTimer(name);
+  const id=setTimeout(()=>{
+    gameTimers.delete(name);
+    callback();
+  },delay);
+  gameTimers.set(name,{type:'timeout',id});
+  return id;
+}
+
+function setGameInterval(name,callback,delay){
+  clearGameTimer(name);
+  const id=setInterval(callback,delay);
+  gameTimers.set(name,{type:'interval',id});
+  return id;
+}
+
+function clearGameTimer(name){
+  const timer=gameTimers.get(name);
+  if(!timer)return;
+  if(timer.type==='interval')clearInterval(timer.id);
+  else clearTimeout(timer.id);
+  gameTimers.delete(name);
+}
+
+function clearAllGameTimers(){
+  for(const name of Array.from(gameTimers.keys()))clearGameTimer(name);
+}
+
+window.addEventListener('beforeunload',clearAllGameTimers);
 
 /* ===== PLAYER ACCOUNT + SECURE WALLET ===== */
 .authModal,.accountModal{
@@ -1610,9 +1670,49 @@ function checkLowCoinPrompt(){
   .bingoShowdownHud{grid-template-columns:1fr}
 }
 
+
+.coinStormLayer{
+  position:fixed;inset:0;z-index:10000;overflow:hidden;pointer-events:none;
+  display:none;background:radial-gradient(circle at 50% 15%,rgba(255,210,59,.18),transparent 42%)
+}
+.coinStormLayer.show{display:block}
+.coinStormCoin{
+  position:absolute;top:-90px;width:42px;height:42px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:
+    radial-gradient(circle at 32% 28%,#fff7a8 0 8%,transparent 9%),
+    radial-gradient(circle,#ffd93d 0 46%,#f29b00 48% 68%,#8c4b00 70% 100%);
+  border:3px solid #ffe88d;color:#8c4b00;font-size:22px;font-weight:1000;
+  box-shadow:0 0 18px #ffd23b, inset 0 0 8px #fff3a0;
+  animation:coinPourFall var(--fall) linear forwards;
+}
+@keyframes coinPourFall{
+  0%{transform:translate3d(0,-90px,0) rotateY(0deg) rotateZ(0deg);opacity:0}
+  8%{opacity:1}
+  75%{opacity:1}
+  100%{transform:translate3d(var(--drift),110vh,0) rotateY(1080deg) rotateZ(720deg);opacity:0}
+}
+.jackpotFlash{
+  position:fixed;left:50%;top:35%;z-index:10001;transform:translate(-50%,-50%) scale(.6);
+  color:#ffd23b;font-size:clamp(42px,8vw,100px);font-weight:1000;text-align:center;
+  text-shadow:0 0 14px #fff,0 0 35px #ff2ba6,0 0 65px #ffd23b;
+  opacity:0;pointer-events:none
+}
+.jackpotFlash.show{animation:jackpotFlashAnim 2.6s ease forwards}
+@keyframes jackpotFlashAnim{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}
+  25%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}
+  70%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-70%) scale(1.25)}
+}
+
 </style>
 </head>
 <body>
+
+<div id="coinStormLayer" class="coinStormLayer"></div>
+<div id="jackpotFlash" class="jackpotFlash">COOKIE COIN JACKPOT!</div>
+
 
 <div class="coinModal" id="gameEntryModal">
   <div class="coinPanel">
@@ -2116,18 +2216,47 @@ function reward(c,x=10){
   secureGameReward(Number(c)||0,activeGameKey||'arcade');
 }
 
-function requestGameEntry(key,callback){
-  if(!currentUser){openAuthModal('login');return}
+async function requestGameEntry(key,callback){
+  if(!currentUser){
+    openAuthModal('login');
+    return;
+  }
+
+  // Always fetch the secure wallet before showing the entry screen.
+  await refreshPlayerAccount();
+
   pendingGameKey=key;
   pendingGameCallback=callback;
   const cost=gameEntryCosts[key]||0;
-  entryGameTitle.textContent=gameDisplayNames[key]||'Enter Game';
-  entryCost.textContent=cost;
-  entryCoinBalance.textContent=state.coins;
-  entryGameMessage.textContent=state.coins>=cost
-    ? 'Your secure wallet will be charged when you press Play Now.'
-    : 'You need more Cookie Coins to play.';
-  gameEntryModal.classList.add('show');
+  const names={
+    spades:"Cookie's Spades",
+    solitaire:"Cookie Solitaire",
+    uno:"Cookie Color Clash",
+    crush:"Cookie Crush Kingdom",
+    bingo:"Cookie Bingo Showdown",
+    word:"Cookie Word Treasure",
+    chess:"Cookie Quick Chess",
+    dominoes:"Cookie Domino House"
+  };
+
+  coinModalTitle.textContent=names[key]||'Cookie Game';
+  coinModalCost.textContent=cost.toLocaleString()+' Coins';
+  coinModalBalance.textContent=Number(state.coins||0).toLocaleString()+' Coins';
+
+  const playBtn=document.getElementById('coinModalPlayBtn');
+  if(playBtn){
+    playBtn.disabled=state.coins<cost;
+    playBtn.textContent=state.coins<cost?'Not Enough Coins':'Play Now';
+  }
+
+  const lowText=document.getElementById('coinModalLowText');
+  if(lowText){
+    lowText.textContent=state.coins<cost
+      ? 'You need more Cookie Coins before this game can begin.'
+      : '<span id="coinModalLowText">Your secure wallet will be charged when you press Play Now.</span>';
+  }
+
+  coinModal.classList.add('show');
 }
 
 async function confirmGameEntry(){
@@ -2275,9 +2404,10 @@ async function startPlayerFlow(){
     }
 
     // Browsers only allow music and sound after a real player click.
+    closeAuthModal();
     await activateArcadeAudio();
     openArcadeScreen();
-    showEntryCoinOffer();
+    setTimeout(showEntryCoinOffer,250);
   }catch(error){
     console.error(error);
     openAuthModal('login');
@@ -2368,7 +2498,7 @@ function sfx(name){
 function startCasinoMusic(){
   if(musicTimer||!state.music)return;
   const bass=[82.4,98,110,98,123.5,110,98,73.4];
-  musicTimer=setInterval(()=>{
+  musicTimer=setGameInterval('casinoMusic',()=>{
     if(!state.music||!state.sound)return;
     const beat=musicStep%16;
     const b=bass[musicStep%bass.length];
@@ -2388,7 +2518,7 @@ function startCasinoMusic(){
 
 function stopCasinoMusic(){
   if(musicTimer){
-    clearInterval(musicTimer);
+    clearGameTimer('casinoMusic');
     musicTimer=null;
   }
 }
@@ -2412,7 +2542,47 @@ async function activateArcadeAudio(){
   }
 }
 
+
+function createMegaCoinStorm(){
+  const layer=document.getElementById('coinStormLayer');
+  const flash=document.getElementById('jackpotFlash');
+  if(!layer||!flash)return;
+
+  layer.innerHTML='';
+  layer.classList.add('show');
+  flash.classList.remove('show');
+  void flash.offsetWidth;
+  flash.classList.add('show');
+
+  const count=180;
+  for(let i=0;i<count;i++){
+    const coin=document.createElement('div');
+    coin.className='coinStormCoin';
+    coin.textContent='₵';
+    coin.style.left=(Math.random()*100)+'vw';
+    coin.style.setProperty('--fall',(2.6+Math.random()*3.4)+'s');
+    coin.style.setProperty('--drift',((Math.random()-.5)*280)+'px');
+    coin.style.animationDelay=(Math.random()*2.2)+'s';
+    coin.style.transform='scale('+(0.65+Math.random()*1.15)+')';
+    layer.appendChild(coin);
+  }
+
+  try{
+    sfx('enter');
+    setGameTimer('coinStormWinSound',()=>sfx('win'),650);
+    setGameTimer('coinStormCrunch',()=>sfx('crunch'),1250);
+  }catch(error){}
+
+  setGameTimer('coinStormCleanup',()=>{
+    layer.classList.remove('show');
+    layer.innerHTML='';
+  },6800);
+}
+
 function openArcadeScreen(){
+  closeAuthModal();
+  closeEntryCoinOffer();
+
   const startScreen=$('start');
   const appScreen=$('app');
 
@@ -2421,7 +2591,7 @@ function openArcadeScreen(){
 
   try{sfx('enter')}catch(error){}
   try{toast("Welcome to Cookie's Casino Arcade!")}catch(error){}
-  try{createCoinRain()}catch(error){}
+  try{createMegaCoinStorm()}catch(error){}
   try{casinoAmbience()}catch(error){}
   try{render()}catch(error){console.warn(error)}
   try{checkCheckoutReturn()}catch(error){}
@@ -2462,13 +2632,29 @@ async function submitAuth(event){
       });
       if(error)throw error;
       authMessage.textContent=data.session?'Account created!':'Check your email to confirm the account.';
-      if(data.session){closeAuthModal();enterArcade()}
+      if(data.session){
+        await applyAuthSession(data.session);
+        closeAuthModal();
+        const startScreen=document.getElementById('start');
+        const appScreen=document.getElementById('app');
+        if(startScreen)startScreen.style.display='flex';
+        if(appScreen)appScreen.style.display='none';
+        setCloudStatus('Account ready — press ENTER','online');
+      }
     }else{
       const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
       if(error)throw error;
-      authMessage.textContent='Signed in!';
-      closeAuthModal();
       await applyAuthSession(data.session);
+      authMessage.textContent='';
+      closeAuthModal();
+
+      // A successful sign-in returns to the entrance.
+      // The player must press ENTER to open the arcade and unlock sound.
+      const startScreen=document.getElementById('start');
+      const appScreen=document.getElementById('app');
+      if(startScreen)startScreen.style.display='flex';
+      if(appScreen)appScreen.style.display='none';
+
       setCloudStatus('Signed in — press ENTER','online');
     }
   }catch(error){
@@ -2509,26 +2695,37 @@ async function secureFetch(url,options={}){
 }
 
 async function refreshPlayerAccount(){
-  if(!currentUser)return;
+  if(!currentUser)return null;
+
   try{
-    const data=await secureFetch('/api/account');
-    currentProfile=data.profile||{};
-    state.coins=Number(data.wallet?.coins||0);
-    state.xp=Number(data.progress?.xp||0);
-    state.vip=Number(data.progress?.vip||1);
-    if(data.progress?.settings){
-      state.sound=data.progress.settings.sound!==false;
-      state.music=data.progress.settings.music!==false;
-      state.voice=data.progress.settings.voice!==false;
+    const account=await secureFetch('/api/account');
+
+    if(account.profile){
+      currentProfile=account.profile;
+      playerName=account.profile.display_name||account.profile.username||'Cookie';
+      const playerNameEl=$('playerName');
+      if(playerNameEl)playerNameEl.textContent=playerName;
     }
-    const name=currentProfile.display_name||currentProfile.username||currentUser.email?.split('@')[0]||'Player';
-    accountChipName.textContent=name;
-    setCloudStatus('Cloud saved','online');
+
+    if(account.wallet){
+      state.coins=Number(account.wallet.coins||0);
+    }
+
+    if(account.progress){
+      state.xp=Number(account.progress.xp||0);
+      state.vip=Number(account.progress.vip||1);
+      const settings=account.progress.settings||{};
+      state.sound=settings.sound!==false;
+      state.music=settings.music!==false;
+      state.voice=settings.voice!==false;
+    }
+
+    walletTransactions=account.transactions||[];
     render();
-    if($('app')?.style.display==='block')checkLowCoinPrompt();
+    return account;
   }catch(error){
-    setCloudStatus('Cloud sync error','error');
-    console.error(error);
+    console.error('Account refresh failed:',error);
+    return null;
   }
 }
 
@@ -2779,8 +2976,8 @@ function rotateSpadesPartners(){
 let premiumWatchdogTimer=null;
 
 function startPremiumWatchdog(){
-  if(premiumWatchdogTimer)clearInterval(premiumWatchdogTimer);
-  premiumWatchdogTimer=setInterval(()=>{
+  clearGameTimer('spadesWatchdog');
+  premiumWatchdogTimer=setGameInterval('spadesWatchdog',()=>{
     const page=$('spades');
     if(!page||!page.classList.contains('active')||pWaitingBid)return;
 
@@ -4112,7 +4309,7 @@ function toggleBingoShowdown(){
   showdownSeconds=4;
   bingoTimer.textContent='0:04';
 
-  showdownTimer=setInterval(()=>{
+  showdownTimer=setGameInterval('bingoCaller',()=>{
     showdownSeconds--;
     if(showdownSeconds<=0){
       callShowdownNumber();
@@ -4125,7 +4322,7 @@ function toggleBingoShowdown(){
 function stopBingoShowdown(){
   showdownRunning=false;
   if(showdownTimer){
-    clearInterval(showdownTimer);
+    clearGameTimer('bingoCaller');
     showdownTimer=null;
   }
   if(window.bingoCallerBtn)bingoCallerBtn.textContent='Start Showdown';

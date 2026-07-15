@@ -67,3 +67,19 @@ GAMEPLAY ANIMATION REBUILD
 - Rebuilt Bingo as a two-card automatic-caller showdown with manual marking.
 - Slowed Domino House and added large turn overlays.
 - Added animated coin deductions and rewards.
+
+
+LOGIN MODAL FIX
+- Corrected showEntryCoinOffer so it is valid JavaScript.
+- The sign-in box now closes after successful authentication.
+- Successful sign-in returns the player to the entrance.
+- Players must press ENTER before the arcade opens.
+- ENTER unlocks browser sound and then displays the coin offer.
+
+
+COIN BALANCE + GLITCH FIX
+- Game entry now refreshes the secure wallet before showing the balance.
+- Existing players missing the starter bonus are topped up to 10,000 coins once.
+- Repeated game intervals are cleared before restarting.
+- Bingo design remains unchanged.
+- Casino entrance now launches a large animated Cookie Coin shower.
