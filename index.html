@@ -1448,14 +1448,33 @@ function checkLowCoinPrompt(){
 }
 
 function returnToEntrance(){
+  document.body.classList.remove('arcadeOpen');
+
   const startScreen=document.getElementById('start');
   const appScreen=document.getElementById('app');
 
-  if(startScreen)startScreen.style.display='flex';
-  if(appScreen)appScreen.style.display='none';
+  if(startScreen){
+    startScreen.style.setProperty('display','flex','important');
+    startScreen.removeAttribute('aria-hidden');
+  }
 
-  closeAuthModal();
-  closeEntryCoinOffer();
+  if(appScreen){
+    appScreen.style.setProperty('display','none','important');
+    appScreen.setAttribute('aria-hidden','true');
+  }
+
+  document.querySelectorAll('#app .page').forEach(page=>{
+    page.classList.remove('active');
+    page.style.setProperty('display','none','important');
+  });
+
+  const lobby=document.getElementById('lobby');
+  if(lobby)lobby.classList.add('active');
+
+  try{closeAuthModal()}catch(error){}
+  try{closeCoinModal()}catch(error){}
+  try{closeEntryCoinOffer()}catch(error){}
+  try{stopCasinoMusic()}catch(error){}
 }
 
 
@@ -1709,7 +1728,73 @@ window.addEventListener('beforeunload',clearAllGameTimers);
 
 #enterArcadeBtn:disabled{opacity:.75;cursor:wait}
 body.arcadeOpen #start{display:none!important;pointer-events:none!important}
-body.arcadeOpen #app{display:block!important}
+body.arcadeOpen #app{display:none}
+
+
+/* ===== AUTHORITATIVE SCREEN SEPARATION ===== */
+#start{
+  display:flex;
+  position:fixed;
+  inset:0;
+  z-index:100;
+}
+
+#app{
+  display:none;
+  min-height:100vh;
+}
+
+body.arcadeOpen #start{
+  display:none!important;
+  pointer-events:none!important;
+}
+
+body.arcadeOpen #app{
+  display:block!important;
+}
+
+#app .page{
+  display:none!important;
+}
+
+#app .page.active{
+  display:block!important;
+}
+
+/* Modal layers remain hidden until their .show class is added. */
+.authModal,
+.coinModal,
+.entryCoinOffer{
+  display:none!important;
+}
+
+.authModal.show,
+.coinModal.show,
+.entryCoinOffer.show{
+  display:flex!important;
+}
+
+/* Do not let hidden game pages take up space. */
+#app section.page:not(.active){
+  visibility:hidden!important;
+  height:0!important;
+  min-height:0!important;
+  overflow:hidden!important;
+  padding:0!important;
+  margin:0!important;
+}
+
+/* Only the selected page is visible and usable. */
+#app section.page.active{
+  visibility:visible!important;
+  height:auto!important;
+  overflow:visible!important;
+}
+
+/* Keep the lobby as the first arcade page. */
+#lobby.active{
+  display:block!important;
+}
 
 </style>
 </head>
@@ -2621,10 +2706,13 @@ function createMegaCoinStorm(){
 
 function openArcadeScreen(){
   try{closeAuthModal()}catch(error){}
+  try{closeCoinModal()}catch(error){}
   try{closeEntryCoinOffer()}catch(error){}
 
   const startScreen=document.getElementById('start');
   const appScreen=document.getElementById('app');
+
+  document.body.classList.add('arcadeOpen');
 
   if(startScreen){
     startScreen.style.setProperty('display','none','important');
@@ -2636,8 +2724,8 @@ function openArcadeScreen(){
     appScreen.removeAttribute('aria-hidden');
   }
 
-  document.body.classList.add('arcadeOpen');
-  window.scrollTo({top:0,behavior:'auto'});
+  // The lobby is always the first and only visible arcade screen.
+  show('lobby');
 
   try{render()}catch(error){console.warn('Render warning:',error)}
   try{toast("Welcome to Cookie's Casino Arcade!")}catch(error){}
@@ -2647,11 +2735,26 @@ function openArcadeScreen(){
 }
 
 function openAuthModal(mode='login'){
-  setAuthMode(mode);
-  authMessage.textContent='';
+  authMode=mode;
   authModal.classList.add('show');
+  authModal.setAttribute('aria-hidden','false');
+
+  const app=document.getElementById('app');
+  const start=document.getElementById('start');
+
+  // Authentication is performed from the entrance, not over the games.
+  document.body.classList.remove('arcadeOpen');
+  if(app)app.style.setProperty('display','none','important');
+  if(start)start.style.setProperty('display','flex','important');
+
+  setAuthMode(mode);
 }
-function closeAuthModal(){authModal.classList.remove('show')}
+function closeAuthModal(){
+  if(!window.authModal)return;
+  authModal.classList.remove('show');
+  authModal.setAttribute('aria-hidden','true');
+  if(window.authMessage)authMessage.textContent='';
+}
 
 function setAuthMode(mode){
   authMode=mode;
@@ -2983,15 +3086,26 @@ function htmlCard(c){return '<div>'+c.r+'</div><div>'+c.s+'</div>'}
 let spHands=[[],[],[],[]],spTrick=[],ct=0,ot=0;
 
 function show(id){
-  document.querySelectorAll('.page').forEach(page=>{
+  const app=document.getElementById('app');
+  if(!app)return;
+
+  app.querySelectorAll('.page').forEach(page=>{
     page.classList.remove('active');
-    page.style.display='none';
+    page.style.setProperty('display','none','important');
+    page.setAttribute('aria-hidden','true');
   });
+
   const target=document.getElementById(id);
-  if(!target){console.error('Missing page:',id);return}
-  target.style.display='block';
+  if(!target){
+    console.error('Missing arcade page:',id);
+    return;
+  }
+
   target.classList.add('active');
-  window.scrollTo({top:0,behavior:'smooth'});
+  target.style.setProperty('display','block','important');
+  target.removeAttribute('aria-hidden');
+
+  window.scrollTo({top:0,behavior:'auto'});
   try{sfx('page')}catch(error){}
 }
 
@@ -4674,6 +4788,33 @@ function drawDomino(){if(dominoPool.length){dominoHandN.push(dominoPool.pop());d
 window.addEventListener("DOMContentLoaded", initPlayerCloud);
 
 
+
+function initializeSeparatedScreens(){
+  document.body.classList.remove('arcadeOpen');
+
+  const start=document.getElementById('start');
+  const app=document.getElementById('app');
+
+  if(start)start.style.setProperty('display','flex','important');
+  if(app)app.style.setProperty('display','none','important');
+
+  document.querySelectorAll('#app .page').forEach(page=>{
+    page.classList.remove('active');
+    page.style.setProperty('display','none','important');
+  });
+
+  const lobby=document.getElementById('lobby');
+  if(lobby){
+    lobby.classList.add('active');
+    lobby.style.setProperty('display','block','important');
+  }
+
+  document.querySelectorAll('.authModal,.coinModal,.entryCoinOffer').forEach(modal=>{
+    modal.classList.remove('show');
+    modal.setAttribute('aria-hidden','true');
+  });
+}
+
 function bindEnterArcadeButton(){
   const button=document.getElementById('enterArcadeBtn');
   if(!button||button.dataset.bound==='true')return;
@@ -4686,6 +4827,7 @@ function bindEnterArcadeButton(){
 }
 
 window.addEventListener('DOMContentLoaded',()=>{
+  initializeSeparatedScreens();
   bindEnterArcadeButton();
   initPlayerCloud();
 });

@@ -90,3 +90,12 @@ ENTER IMMEDIATE FIX
 - The entrance Cloud Saved message is hidden.
 - The ENTER button has a direct event listener and loading state.
 - Audio, wallet refresh, coin offer, and effects start after entry and cannot block it.
+
+
+SEPARATED SCREENS FIX
+- The entrance, login, lobby, and games are now separate screens.
+- The site opens on the entrance only.
+- Login appears only as a modal over the entrance.
+- ENTER opens the lobby only.
+- Selecting a game hides the lobby and all other games.
+- Popups stay hidden until they are requested.
