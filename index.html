@@ -1,0 +1,4431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cookie's Casino Arcade Stable</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#fff;background:
+radial-gradient(circle at 15% 10%,rgba(255,0,170,.48),transparent 22%),
+radial-gradient(circle at 85% 12%,rgba(255,202,40,.42),transparent 22%),
+linear-gradient(135deg,#08000d,#1e0030 48%,#08000d);min-height:100vh}
+button{border:0;border-radius:999px;padding:12px 18px;font-weight:900;cursor:pointer;color:#2d0b00;background:linear-gradient(#fff8c5,#ffd23b,#ff9b19);box-shadow:0 5px 0 #914300,0 12px 24px rgba(0,0,0,.3)}
+button:active{transform:translateY(3px);box-shadow:0 2px 0 #914300}
+.card{background:linear-gradient(180deg,rgba(255,255,255,.15),rgba(255,255,255,.06));border:1px solid rgba(255,255,255,.2);border-radius:28px;box-shadow:0 20px 55px rgba(0,0,0,.45);backdrop-filter:blur(8px)}
+#start{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:18px;background:radial-gradient(circle,rgba(255,0,170,.2),transparent 35%),#050006}
+.startBox{text-align:center;width:min(900px,96vw);padding:38px;border-radius:36px;background:rgba(0,0,0,.62);border:2px solid #ff2ba6;box-shadow:0 0 48px rgba(255,43,166,.6)}
+.logo{font-size:min(78px,13vw);font-weight:1000;line-height:.9;color:#ffd23b;text-shadow:0 0 22px #ffd23b}
+.logo span{display:block;color:#ff2ba6;text-shadow:0 0 22px #ff2ba6}
+.startBox p{font-size:19px;color:#ffe4b3;line-height:1.45}
+.app{display:none;max-width:1280px;margin:auto;padding:14px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 18px;margin-bottom:14px}
+.brand{font-size:28px;font-weight:1000;color:#ffd23b}
+.bank{display:flex;gap:8px;flex-wrap:wrap}
+.badge{padding:9px 13px;border-radius:999px;background:rgba(0,0,0,.38);border:1px solid rgba(255,255,255,.18);font-weight:900}
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.page{display:none}.page.active{display:block}
+.lobby{padding:24px;min-height:680px}
+.hero{text-align:center}.hero h1{font-size:min(64px,12vw);line-height:.9;margin:0;color:#ffd23b;text-shadow:0 0 18px #ffd23b}.hero h1 span{color:#ff2ba6}.hero p{font-size:19px;color:#ffe5b6}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:20px}
+.tile{min-height:235px;padding:18px;border-radius:26px;background:linear-gradient(180deg,rgba(255,0,170,.18),rgba(0,0,0,.36));border:2px solid #ffbe22;cursor:pointer;transition:.15s}
+.tile:hover{transform:translateY(-7px);filter:brightness(1.1)}
+.tile .icon{font-size:66px}.tile h2{color:#ffd23b;font-size:28px;margin:8px 0}.tile p{color:#ffe4b3}
+.game{padding:18px;min-height:700px}
+.gameHead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}.gameHead h1{margin:0;color:#ffd23b}
+.toast{position:fixed;left:50%;top:16%;transform:translateX(-50%);z-index:80;display:none;padding:18px 26px;border-radius:22px;background:linear-gradient(#fff4c8,#ffc928);color:#2d0b00;font-size:25px;font-weight:1000;text-align:center;box-shadow:0 0 32px #ffc928}
+.spark{position:fixed;z-index:85;font-size:28px;pointer-events:none;animation:fly .85s forwards}
+@keyframes fly{to{opacity:0;transform:translate(var(--x),var(--y)) rotate(180deg) scale(1.4)}}
+.log{background:rgba(0,0,0,.3);border-radius:16px;padding:10px;color:#ffe3b0;margin-top:10px;min-height:50px}
+
+/* spades */
+.table{min-height:610px;border-radius:32px;background:radial-gradient(circle,#0b8754,#06452b);border:11px solid #7f3e10;position:relative;box-shadow:inset 0 0 58px rgba(0,0,0,.5)}
+.player{position:absolute;text-align:center;font-weight:900}.topP{top:12px;left:50%;transform:translateX(-50%)}.leftP{left:12px;top:43%;transform:translateY(-50%)}.rightP{right:12px;top:43%;transform:translateY(-50%)}.bottomP{bottom:10px;left:50%;transform:translateX(-50%)}
+.avatar{width:56px;height:56px;border-radius:50%;margin:auto;display:flex;align-items:center;justify-content:center;font-size:32px;border:3px solid #ffd23b;background:#111;box-shadow:0 0 16px #ffd23b}
+.hand{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;max-width:720px}.back{width:24px;height:34px;border-radius:5px;background:linear-gradient(135deg,#ff2ba6,#ffd23b);border:1px solid white}
+.cardFace{width:56px;height:82px;border-radius:9px;background:#fff8e8;color:#111;border:2px solid white;display:flex;align-items:center;justify-content:center;flex-direction:column;font-weight:1000;cursor:pointer;box-shadow:0 6px 12px rgba(0,0,0,.35)}
+.cardFace:hover{transform:translateY(-8px)}.red{color:#c4002f}.black{color:#111}
+.centerCards{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);display:flex;gap:12px}
+.scoreBox{position:absolute;left:50%;top:34%;transform:translate(-50%,-50%);padding:10px 16px;border-radius:18px;background:rgba(0,0,0,.6);border:2px solid #ffd23b;text-align:center}.scoreBox b{display:block;color:#ffd23b}
+
+/* solitaire */
+.solTop{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:15px}.slot{width:74px;height:105px;border-radius:12px;border:2px dashed rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.2);cursor:pointer}
+.solBoard{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}.pile{min-height:350px;padding:5px;border-radius:14px;background:rgba(0,0,0,.2)}
+.solCard{width:62px;height:88px;margin:auto;border-radius:9px;background:#fff8e8;color:#111;border:2px solid white;display:flex;align-items:center;justify-content:center;flex-direction:column;font-weight:1000;cursor:pointer;box-shadow:0 5px 10px rgba(0,0,0,.3)}
+.solCard+.solCard{margin-top:-52px}.solBack{background:linear-gradient(135deg,#ff2ba6,#5f1ad7);color:white}.solCard.sel{outline:4px solid #ffd23b}
+
+/* uno */
+.unoArena{text-align:center}.unoCenter{display:flex;justify-content:center;gap:18px;margin:20px}.unoCard{width:82px;height:122px;border-radius:16px;color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:1000;border:4px solid white;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.45)}
+.unoHand{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}.wild{background:conic-gradient(red,gold,green,blue,red)!important}
+
+/* crush */
+.crushLayout{display:grid;grid-template-columns:1fr 260px;gap:16px}.board{display:grid;grid-template-columns:repeat(8,1fr);gap:7px;max-width:620px;margin:auto;padding:12px;border-radius:24px;background:rgba(0,0,0,.34);border:2px solid #ff2ba6}
+.gem{aspect-ratio:1;border-radius:17px;display:flex;align-items:center;justify-content:center;font-size:32px;background:rgba(255,255,255,.13);cursor:pointer;box-shadow:inset 0 0 12px rgba(255,255,255,.2),0 5px 0 rgba(0,0,0,.3)}
+.gem.sel{outline:4px solid #ffd23b;transform:scale(1.1)}.gem.pop{animation:pop .35s}
+@keyframes pop{50%{transform:scale(1.35) rotate(12deg);filter:brightness(2)}}
+.side{padding:16px}.stat{padding:12px;border-radius:17px;background:rgba(0,0,0,.28);margin:8px 0}.stat small{display:block;color:#ffd23b}.stat b{font-size:25px}
+@media(max-width:850px){.crushLayout{grid-template-columns:1fr}.cardFace{width:46px;height:68px;font-size:12px}.table{min-height:690px}.solCard{width:44px;height:66px;font-size:11px}.solCard+.solCard{margin-top:-38px}.gem{font-size:23px}}
+
+/* ===== PHASE 1: PREMIUM CASINO LOBBY ===== */
+.casinoLobby{
+  position:relative;
+  min-height:760px;
+  overflow:hidden;
+  padding:0;
+  border-radius:30px;
+  background:
+    linear-gradient(180deg,rgba(10,0,18,.18),rgba(4,0,8,.82)),
+    radial-gradient(circle at 50% 14%,rgba(255,214,64,.22),transparent 22%),
+    linear-gradient(135deg,#170022,#380047 46%,#110016);
+}
+.casinoLobby:before{
+  content:"";
+  position:absolute;inset:0;
+  background:
+    repeating-linear-gradient(90deg,transparent 0 88px,rgba(255,255,255,.025) 89px 90px),
+    linear-gradient(180deg,transparent 0 62%,rgba(255,0,170,.08) 63%,rgba(255,208,45,.13) 100%);
+  pointer-events:none
+}
+.ceilingLights{
+  position:absolute;left:0;right:0;top:0;height:120px;
+  background:
+    radial-gradient(circle at 10% 20%,#ffd23b 0 5px,transparent 6px),
+    radial-gradient(circle at 25% 45%,#ff2ba6 0 5px,transparent 6px),
+    radial-gradient(circle at 40% 18%,#62f0cf 0 5px,transparent 6px),
+    radial-gradient(circle at 58% 42%,#ffd23b 0 5px,transparent 6px),
+    radial-gradient(circle at 74% 18%,#ff2ba6 0 5px,transparent 6px),
+    radial-gradient(circle at 90% 44%,#62f0cf 0 5px,transparent 6px);
+  filter:drop-shadow(0 0 10px #fff);
+  animation:ceilingPulse 2.3s ease-in-out infinite alternate
+}
+@keyframes ceilingPulse{to{opacity:.45;filter:drop-shadow(0 0 20px #ffd23b)}}
+.spotlight{
+  position:absolute;top:-160px;left:50%;width:360px;height:700px;
+  transform-origin:top center;
+  background:linear-gradient(180deg,rgba(255,255,255,.15),rgba(255,210,60,.02) 80%,transparent);
+  clip-path:polygon(45% 0,55% 0,100% 100%,0 100%);
+  filter:blur(4px);
+  animation:sweep 7s ease-in-out infinite alternate;
+  pointer-events:none
+}
+@keyframes sweep{0%{transform:translateX(-50%) rotate(-14deg)}100%{transform:translateX(-50%) rotate(14deg)}}
+.neonMarquee{
+  position:relative;
+  z-index:2;
+  text-align:center;
+  padding:30px 18px 10px
+}
+.neonMarquee .small{
+  display:inline-block;
+  padding:6px 14px;
+  border-radius:999px;
+  background:#0008;
+  border:1px solid #ffffff33;
+  color:#fff3bd;
+  font-size:13px;
+  letter-spacing:3px;
+  font-weight:900
+}
+.neonMarquee h1{
+  margin:12px 0 8px;
+  font-size:min(68px,12vw);
+  line-height:.88;
+  color:#ffd23b;
+  text-shadow:0 0 10px #ffd23b,0 0 22px #ffd23b,0 6px 0 #6d3000
+}
+.neonMarquee h1 span{
+  display:block;
+  color:#ff2ba6;
+  text-shadow:0 0 10px #ff2ba6,0 0 25px #ff2ba6
+}
+.neonMarquee p{margin:0;color:#ffe8bf;font-size:18px}
+.lobbyWalkway{
+  position:relative;
+  z-index:2;
+  width:min(1120px,94%);
+  margin:26px auto 0;
+  padding:24px 22px 34px;
+  border-radius:32px 32px 12px 12px;
+  background:
+    linear-gradient(90deg,transparent,rgba(255,255,255,.04),transparent),
+    repeating-linear-gradient(90deg,#15051f 0 52px,#1e0829 52px 104px);
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 30px 70px #0009,inset 0 0 38px #ff2ba611
+}
+.arcadeMachines{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+  align-items:end
+}
+.machine{
+  position:relative;
+  min-height:380px;
+  padding:16px 14px 18px;
+  border-radius:34px 34px 18px 18px;
+  cursor:pointer;
+  transition:.18s transform,.18s filter;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,.04)),
+    linear-gradient(135deg,#321047,#100015);
+  border:3px solid var(--machineColor);
+  box-shadow:
+    0 12px 0 #070008,
+    0 0 24px color-mix(in srgb,var(--machineColor) 70%,transparent),
+    inset 0 0 28px color-mix(in srgb,var(--machineColor) 24%,transparent)
+}
+.machine:hover{transform:translateY(-12px) scale(1.025);filter:brightness(1.14)}
+.machine:before{
+  content:"";
+  position:absolute;left:14%;right:14%;bottom:-23px;height:26px;
+  border-radius:0 0 20px 20px;
+  background:linear-gradient(180deg,#190321,#070008);
+  border:2px solid var(--machineColor);
+  border-top:0
+}
+.machineTop{
+  text-align:center;
+  font-size:20px;
+  font-weight:1000;
+  color:#fff;
+  text-shadow:0 0 12px var(--machineColor);
+  margin-bottom:12px
+}
+.machineScreen{
+  height:205px;
+  border-radius:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  background:
+    radial-gradient(circle,rgba(255,255,255,.17),transparent 45%),
+    linear-gradient(135deg,#0a0010,#2a0435);
+  border:3px solid #111;
+  box-shadow:inset 0 0 24px #000,0 0 18px var(--machineColor);
+  overflow:hidden;
+  position:relative
+}
+.machineScreen:after{
+  content:"";
+  position:absolute;inset:-70% -35%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);
+  transform:rotate(25deg);
+  animation:screenShine 3.6s linear infinite
+}
+@keyframes screenShine{to{translate:120%}}
+.machineIcon{
+  font-size:76px;
+  filter:drop-shadow(0 0 14px var(--machineColor));
+  animation:machineBounce 1.8s ease-in-out infinite alternate
+}
+@keyframes machineBounce{to{transform:translateY(-7px) scale(1.06)}}
+.machineName{font-size:27px;font-weight:1000;color:#ffd23b;margin-top:5px;text-align:center}
+.machineSub{font-size:12px;color:#ffe5b3;text-align:center;margin-top:4px}
+.machineControls{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:12px;
+  margin-top:16px
+}
+.joystick{
+  width:34px;height:34px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#fff,#ff2ba6 35%,#6e003c 75%);
+  box-shadow:0 5px 0 #4b002b
+}
+.machineButtons{display:flex;gap:7px}
+.machineButtons i{display:block;width:22px;height:22px;border-radius:50%;background:#ffd23b;box-shadow:0 4px 0 #7f4000}
+.machineButtons i:nth-child(2){background:#62f0cf;box-shadow:0 4px 0 #147e68}
+.lobbyFooter{
+  position:relative;z-index:2;
+  display:flex;justify-content:center;gap:12px;flex-wrap:wrap;
+  padding:32px 18px 20px
+}
+.cookieCoin{
+  position:absolute;
+  width:28px;height:28px;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;
+  background:radial-gradient(circle at 35% 30%,#fff1a8,#ffbd18 48%,#8a4300 78%);
+  border:2px solid #fff0a0;
+  box-shadow:0 0 14px #ffd23b;
+  animation:fallCoin linear infinite;
+  pointer-events:none;
+  z-index:1
+}
+@keyframes fallCoin{
+  from{transform:translateY(-90px) rotate(0);opacity:0}
+  10%{opacity:1}
+  to{transform:translateY(850px) rotate(720deg);opacity:.1}
+}
+.walkIn{
+  animation:walkIn .9s ease-out both
+}
+@keyframes walkIn{from{opacity:0;transform:translateY(40px) scale(.96)}to{opacity:1;transform:none}}
+@media(max-width:950px){
+  .arcadeMachines{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:560px){
+  .arcadeMachines{grid-template-columns:1fr}
+  .machine{min-height:330px}
+  .machineScreen{height:175px}
+}
+
+
+/* ===== PHASE 2: PREMIUM SPADES ROOM ===== */
+.spadesRoomShell{
+  position:relative;
+  min-height:760px;
+  overflow:hidden;
+  border-radius:30px;
+  padding:18px;
+  background:
+    radial-gradient(circle at 50% 30%,rgba(255,210,70,.12),transparent 28%),
+    linear-gradient(180deg,#16051d,#09000e 72%);
+}
+.spadesRoomShell:before{
+  content:"";
+  position:absolute;inset:0;
+  background:
+    radial-gradient(circle at 14% 16%,rgba(255,43,166,.22),transparent 15%),
+    radial-gradient(circle at 86% 18%,rgba(98,240,207,.18),transparent 15%);
+  pointer-events:none
+}
+.spadesStage{
+  position:relative;
+  z-index:1;
+  display:grid;
+  grid-template-columns:290px 1fr;
+  gap:16px;
+}
+.spadesControlPanel{
+  padding:16px;
+  min-height:700px;
+}
+.scoreTitle{
+  text-align:center;
+  font-size:20px;
+  font-weight:1000;
+  color:#ffd23b;
+  margin-bottom:10px
+}
+.teamBoard{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:12px
+}
+.teamCard{
+  padding:12px;
+  border-radius:18px;
+  background:#0007;
+  border:1px solid #fff2;
+  text-align:center
+}
+.teamCard.active{
+  border-color:#ffd23b;
+  box-shadow:0 0 18px #ffd23b55
+}
+.teamCard small{display:block;color:#ffe0a8;font-size:11px;letter-spacing:1px}
+.teamCard b{font-size:24px;color:#ffd23b}
+.bagRow{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  margin:8px 0 14px;
+  font-size:13px;
+  color:#ffe8bf
+}
+.bidPanel{
+  padding:12px;
+  border-radius:18px;
+  background:rgba(255,255,255,.07);
+  margin-bottom:12px
+}
+.bidPanel h3{margin:0 0 8px;color:#ffd23b}
+.bidGrid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:7px
+}
+.bidGrid button{padding:9px}
+.spadesMessage{
+  min-height:58px;
+  padding:10px;
+  border-radius:16px;
+  background:#0006;
+  color:#ffe7b7;
+  font-weight:700;
+  line-height:1.35
+}
+.roundSummary{
+  margin-top:12px;
+  padding:10px;
+  border-radius:16px;
+  background:linear-gradient(135deg,rgba(255,210,59,.12),rgba(255,43,166,.12));
+  border:1px solid rgba(255,255,255,.13);
+  font-size:13px;
+  color:#ffe8bf
+}
+.premiumTable{
+  min-height:700px;
+  border-radius:40px;
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 48%,rgba(255,255,255,.08),transparent 25%),
+    radial-gradient(circle,#0b8a55,#075d39 56%,#033820);
+  border:14px solid #4f250b;
+  box-shadow:
+    inset 0 0 70px rgba(0,0,0,.45),
+    0 24px 55px rgba(0,0,0,.5),
+    0 0 26px rgba(255,210,59,.22)
+}
+.premiumTable:before{
+  content:"COOKIE'S HIGH ROLLERS";
+  position:absolute;
+  left:50%;top:47%;
+  transform:translate(-50%,-50%) rotate(-8deg);
+  font-size:54px;
+  font-weight:1000;
+  letter-spacing:4px;
+  color:rgba(255,210,59,.08);
+  white-space:nowrap
+}
+.tableGlow{
+  position:absolute;inset:14px;border-radius:28px;
+  box-shadow:inset 0 0 30px rgba(255,210,59,.18);
+  animation:tablePulse 2s ease-in-out infinite alternate;
+  pointer-events:none
+}
+@keyframes tablePulse{to{box-shadow:inset 0 0 48px rgba(255,210,59,.34)}}
+.playerSeat{
+  position:absolute;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:8px 11px;
+  border-radius:22px;
+  background:rgba(0,0,0,.42);
+  border:1px solid rgba(255,255,255,.16);
+  min-width:150px
+}
+.playerSeat.turn{
+  border-color:#ffd23b;
+  box-shadow:0 0 22px #ffd23b66;
+  animation:seatPulse .7s ease-in-out infinite alternate
+}
+@keyframes seatPulse{to{filter:brightness(1.25)}}
+.playerSeat .avatarWrap{
+  position:relative;
+  width:66px;height:66px;
+  flex:0 0 auto
+}
+.playerSeat .avatarFace{
+  width:66px;height:66px;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:36px;
+  border:3px solid #fff1b2;
+  background:linear-gradient(#fff0bd,#c2701a);
+  box-shadow:0 0 16px rgba(255,210,59,.45)
+}
+.reactionBubble{
+  position:absolute;
+  left:50%;top:-54px;
+  transform:translate(-50%,8px);
+  padding:8px 11px;
+  border-radius:14px;
+  background:#fff4d3;
+  color:#351406;
+  font-size:13px;
+  line-height:1.2;
+  font-weight:900;
+  opacity:0;
+  transition:.2s;
+  min-width:150px;
+  max-width:210px;
+  white-space:normal;
+  text-align:center;
+  z-index:20;
+  box-shadow:0 8px 20px rgba(0,0,0,.35)
+}
+.reactionBubble.show{opacity:1;transform:translate(-50%,0)}
+.playerMeta .name{font-weight:1000;color:#fff}
+.playerMeta .mini{font-size:12px;color:#ffe1a6}
+.seatNorth{top:16px;left:50%;transform:translateX(-50%)}
+.seatWest{left:16px;top:42%;transform:translateY(-50%)}
+.seatEast{right:16px;top:42%;transform:translateY(-50%)}
+.seatSouth{left:50%;bottom:118px;transform:translateX(-50%)}
+.scoreRibbon{
+  position:absolute;
+  left:18px;top:18px;
+  transform:none;
+  display:flex;
+  gap:10px;
+  padding:8px 14px;
+  border-radius:999px;
+  background:#0009;
+  border:2px solid #ffd23b;
+  color:#fff1b6;
+  font-weight:1000;
+  z-index:12
+}
+.scoreRibbon span{color:#ffd23b}
+.trickZone{
+  position:absolute;
+  left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  width:300px;height:245px;
+}
+.playedCard{
+  position:absolute;
+  width:78px;height:110px;
+  border-radius:11px;
+  background:#fff8e8;
+  border:2px solid #fff;
+  box-shadow:0 9px 18px rgba(0,0,0,.42);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  font-weight:1000;
+  animation:cardFly .55s ease-out both
+}
+@keyframes cardFly{
+  from{opacity:0;transform:translate(var(--fromX),var(--fromY)) scale(.65) rotate(var(--rot))}
+  to{opacity:1;transform:translate(0,0) rotate(var(--finalRot))}
+}
+.playNorth{left:111px;top:0}
+.playWest{left:18px;top:70px}
+.playEast{right:18px;top:70px}
+.playSouth{left:111px;bottom:0}
+.playerHand{
+  position:absolute;
+  left:50%;bottom:12px;
+  transform:translateX(-50%);
+  display:flex;
+  justify-content:center;
+  align-items:end;
+  width:min(840px,97%);
+  padding-top:18px
+}
+.handCard{
+  width:66px;height:96px;
+  margin-left:-13px;
+  border-radius:10px;
+  background:#fff8e8;
+  border:2px solid #fff;
+  box-shadow:0 8px 16px rgba(0,0,0,.4);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  font-weight:1000;
+  cursor:pointer;
+  transition:.15s;
+  transform:rotate(var(--fanRot)) translateY(var(--fanY))
+}
+.handCard:first-child{margin-left:0}
+.handCard:hover,.handCard.playable:hover{
+  transform:rotate(var(--fanRot)) translateY(calc(var(--fanY) - 14px)) scale(1.06);
+  z-index:10
+}
+.handCard.disabled{opacity:.42;cursor:not-allowed}
+.handCard.playable{box-shadow:0 8px 16px rgba(0,0,0,.4),0 0 12px rgba(255,210,59,.45)}
+.cardBackFan{
+  display:flex;
+  max-width:130px;
+  flex-wrap:wrap
+}
+.cardBackFan i{
+  display:block;
+  width:23px;height:34px;
+  margin:1px;
+  border-radius:5px;
+  border:1px solid #fff;
+  background:linear-gradient(135deg,#ff2ba6,#ffd23b)
+}
+.bookBurst{
+  position:absolute;
+  left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  font-size:58px;
+  font-weight:1000;
+  color:#ffd23b;
+  text-shadow:0 0 18px #ffd23b,0 4px 0 #6a2f00;
+  z-index:20;
+  opacity:0;
+  pointer-events:none
+}
+.bookBurst.show{animation:burstBook .9s ease-out}
+@keyframes burstBook{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}
+  25%{opacity:1;transform:translate(-50%,-50%) scale(1.18)}
+  75%{opacity:1}
+  100%{opacity:0;transform:translate(-50%,-60%) scale(.9)}
+}
+@media(max-width:980px){
+  .spadesStage{grid-template-columns:1fr}
+  .spadesControlPanel{min-height:auto}
+}
+@media(max-width:700px){
+  .premiumTable{min-height:760px}
+  .seatWest{top:26%;left:8px}
+  .seatEast{top:26%;right:8px}
+  .seatSouth{bottom:150px}
+  .handCard{width:49px;height:72px;font-size:12px;margin-left:-9px}
+  .trickZone{width:240px}
+  .playedCard{width:62px;height:88px;font-size:12px}
+  .playNorth,.playSouth{left:89px}
+}
+
+
+.thinkingDot{
+  display:inline-block;
+  width:7px;height:7px;
+  margin:0 2px;
+  border-radius:50%;
+  background:#ffd23b;
+  animation:thinkPulse .8s infinite alternate
+}
+.thinkingDot:nth-child(2){animation-delay:.15s}
+.thinkingDot:nth-child(3){animation-delay:.3s}
+@keyframes thinkPulse{to{opacity:.25;transform:translateY(-3px)}}
+.tableThinking{
+  position:absolute;
+  left:18px;top:64px;
+  transform:none;
+  padding:8px 14px;
+  border-radius:999px;
+  background:#0009;
+  border:1px solid #ffd23b;
+  color:#ffe8bf;
+  font-weight:900;
+  z-index:8;
+  opacity:0;
+  transition:.2s
+}
+.tableThinking.show{opacity:1}
+
+
+.stablePlayedCard{
+  animation:cardLand .5s ease-out both;
+}
+@keyframes cardLand{
+  from{opacity:0;transform:translate(var(--fromX),var(--fromY)) scale(.72) rotate(var(--rot))}
+  to{opacity:1;transform:translate(0,0) rotate(var(--finalRot))}
+}
+
+
+/* ===== PHASE 3: PREMIUM COOKIE CRUSH ===== */
+.crushWorld{
+  position:relative;
+  min-height:760px;
+  overflow:hidden;
+  padding:18px;
+  border-radius:30px;
+  background:
+    radial-gradient(circle at 18% 12%,rgba(255,210,59,.18),transparent 18%),
+    radial-gradient(circle at 82% 18%,rgba(255,43,166,.2),transparent 20%),
+    linear-gradient(180deg,#2c053b,#120018 70%);
+}
+.crushWorld:before{
+  content:"";
+  position:absolute;inset:0;
+  background:
+    radial-gradient(circle at 14% 78%,rgba(98,240,207,.13),transparent 20%),
+    radial-gradient(circle at 86% 80%,rgba(255,140,0,.12),transparent 22%);
+  pointer-events:none
+}
+.crushStage{
+  position:relative;
+  z-index:1;
+  display:grid;
+  grid-template-columns:1fr 285px;
+  gap:16px;
+}
+.crushBoardWrap{
+  position:relative;
+  padding:18px;
+  border-radius:28px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.11),rgba(255,255,255,.04)),
+    rgba(0,0,0,.24);
+  border:2px solid rgba(255,255,255,.15);
+  box-shadow:0 24px 55px rgba(0,0,0,.42),inset 0 0 34px rgba(255,43,166,.14)
+}
+.crushBoardPro{
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  gap:8px;
+  max-width:680px;
+  margin:auto;
+  padding:14px;
+  border-radius:26px;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.11),rgba(255,255,255,.03)),
+    rgba(0,0,0,.34);
+  border:3px solid #ff2ba6;
+  box-shadow:0 0 28px rgba(255,43,166,.45),inset 0 0 25px rgba(255,255,255,.06)
+}
+.candyTile{
+  position:relative;
+  aspect-ratio:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:19px;
+  font-size:35px;
+  cursor:pointer;
+  user-select:none;
+  transition:.16s;
+  background:
+    radial-gradient(circle at 35% 30%,rgba(255,255,255,.3),transparent 28%),
+    linear-gradient(180deg,rgba(255,255,255,.15),rgba(255,255,255,.04));
+  box-shadow:
+    inset 0 0 16px rgba(255,255,255,.18),
+    0 6px 0 rgba(0,0,0,.36),
+    0 0 12px rgba(255,255,255,.08)
+}
+.candyTile:hover{transform:translateY(-3px) scale(1.04)}
+.candyTile.selected{outline:4px solid #ffd23b;transform:scale(1.1)}
+.candyTile.pop{animation:candyPop .42s ease-in-out}
+@keyframes candyPop{
+  0%{transform:scale(1)}
+  45%{transform:scale(1.42) rotate(16deg);filter:brightness(2)}
+  100%{transform:scale(.2);opacity:0}
+}
+.candyTile.drop{animation:candyDrop .38s ease-out}
+@keyframes candyDrop{from{transform:translateY(-80px);opacity:.1}to{transform:none;opacity:1}}
+.candyTile.stripedRow:after,
+.candyTile.stripedCol:after{
+  content:"";
+  position:absolute;
+  inset:8px;
+  border-radius:12px;
+  border:3px solid #fff;
+  opacity:.85
+}
+.candyTile.stripedRow:after{
+  background:repeating-linear-gradient(0deg,transparent 0 7px,rgba(255,255,255,.72) 7px 11px)
+}
+.candyTile.stripedCol:after{
+  background:repeating-linear-gradient(90deg,transparent 0 7px,rgba(255,255,255,.72) 7px 11px)
+}
+.candyTile.bomb:after{
+  content:"💥";
+  position:absolute;
+  right:-4px;top:-9px;
+  font-size:24px;
+  filter:drop-shadow(0 0 7px #ffd23b)
+}
+.candyTile.rainbow{
+  background:conic-gradient(#ff2ba6,#ffd23b,#62f0cf,#5a16d8,#ff2ba6)
+}
+.candyTile.rainbow:after{
+  content:"⭐";
+  position:absolute;
+  font-size:24px;
+  text-shadow:0 0 8px white
+}
+.candyTile.blocker{
+  background:linear-gradient(135deg,#6d3b1b,#2d1207);
+  border:3px solid #c98a45;
+  cursor:default
+}
+.candyTile.blocker:after{content:"🍫";font-size:34px}
+.crushHUD{
+  padding:16px;
+  min-height:700px
+}
+.levelBadge{
+  text-align:center;
+  padding:12px;
+  border-radius:20px;
+  background:linear-gradient(135deg,rgba(255,210,59,.16),rgba(255,43,166,.14));
+  border:1px solid rgba(255,255,255,.14);
+  margin-bottom:12px
+}
+.levelBadge small{display:block;color:#ffe1a6;letter-spacing:2px}
+.levelBadge b{font-size:28px;color:#ffd23b}
+.progressOuter{
+  height:18px;
+  border-radius:999px;
+  background:#0007;
+  overflow:hidden;
+  border:1px solid #fff2;
+  margin:8px 0 14px
+}
+.progressInner{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#ff2ba6,#ffd23b,#62f0cf);
+  transition:.3s;
+  box-shadow:0 0 12px #ffd23b
+}
+.goalBox{
+  padding:12px;
+  border-radius:18px;
+  background:#0006;
+  margin-bottom:12px
+}
+.goalBox h3{margin:0 0 8px;color:#ffd23b}
+.goalRow{display:flex;justify-content:space-between;gap:8px;color:#ffe8bf}
+.powerLegend{
+  padding:12px;
+  border-radius:18px;
+  background:rgba(255,255,255,.06);
+  font-size:13px;
+  line-height:1.5;
+  color:#ffe5b5
+}
+.powerLegend b{color:#ffd23b}
+.comboBanner{
+  position:absolute;
+  left:50%;top:46%;
+  transform:translate(-50%,-50%) scale(.5);
+  font-size:56px;
+  font-weight:1000;
+  color:#ffd23b;
+  text-shadow:0 0 16px #ffd23b,0 5px 0 #7b3600;
+  z-index:20;
+  opacity:0;
+  pointer-events:none;
+  white-space:nowrap
+}
+.comboBanner.show{animation:comboShow 1.1s ease-out}
+@keyframes comboShow{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}
+  22%{opacity:1;transform:translate(-50%,-50%) scale(1.18)}
+  78%{opacity:1}
+  100%{opacity:0;transform:translate(-50%,-60%) scale(.9)}
+}
+.boardShake{animation:boardShake .32s}
+@keyframes boardShake{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-7px)}
+  50%{transform:translateX(7px)}
+  75%{transform:translateX(-4px)}
+}
+.levelCompleteOverlay{
+  position:absolute;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:30;
+  background:rgba(10,0,20,.78);
+  backdrop-filter:blur(5px)
+}
+.levelCompleteOverlay.show{display:flex}
+.levelCompleteCard{
+  text-align:center;
+  padding:28px;
+  border-radius:30px;
+  background:linear-gradient(180deg,#fff4c9,#ffc83d);
+  color:#351406;
+  box-shadow:0 0 45px #ffd23b
+}
+.levelCompleteCard h2{font-size:42px;margin:0 0 10px}
+@media(max-width:950px){
+  .crushStage{grid-template-columns:1fr}
+  .crushHUD{min-height:auto}
+}
+@media(max-width:600px){
+  .candyTile{font-size:25px;border-radius:14px}
+  .crushBoardPro{gap:6px;padding:8px}
+}
+
+
+.crushBoardPro.size6{grid-template-columns:repeat(6,1fr);max-width:520px}
+.crushBoardPro.size7{grid-template-columns:repeat(7,1fr);max-width:600px}
+.crushBoardPro.size8{grid-template-columns:repeat(8,1fr);max-width:680px}
+.crushBoardPro.size9{grid-template-columns:repeat(9,1fr);max-width:760px}
+.candyTile.vanish{animation:candyVanish .42s ease-in forwards}
+@keyframes candyVanish{
+  0%{transform:scale(1);opacity:1}
+  45%{transform:scale(.65) rotate(10deg);opacity:.75}
+  100%{transform:scale(0);opacity:0}
+}
+.levelTheme{
+  margin-top:10px;padding:10px;border-radius:14px;background:#0005;color:#ffe8bf;font-size:13px
+}
+.solHelp{
+  padding:12px;border-radius:16px;background:#0005;color:#ffe8bf;margin-bottom:12px;line-height:1.4
+}
+.unoActionBar{
+  display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:12px 0
+}
+.unoStatus{
+  padding:12px;border-radius:16px;background:#0006;color:#ffe8bf;margin:10px auto;max-width:700px
+}
+
+
+/* ===== PHASE 5: MEGA 8-GAME ARCADE ===== */
+.arcadeMachines{grid-template-columns:repeat(4,1fr);row-gap:42px}
+.casinoLobby.megaShow{animation:megaLobbyShow 2.8s ease-in-out}
+@keyframes megaLobbyShow{
+  0%,100%{filter:brightness(1) saturate(1)}
+  15%{filter:brightness(1.45) saturate(2) hue-rotate(20deg)}
+  30%{filter:brightness(.9) saturate(1.3) hue-rotate(-20deg)}
+  45%{filter:brightness(1.55) saturate(2.2) hue-rotate(45deg)}
+  65%{filter:brightness(1.05) saturate(1.7) hue-rotate(-35deg)}
+  82%{filter:brightness(1.5) saturate(2)}
+}
+.machine.megaFlash{animation:machineMega .7s ease-in-out infinite alternate}
+@keyframes machineMega{to{transform:translateY(-8px) scale(1.03);filter:brightness(1.45) saturate(1.8)}}
+.danceBeam{
+  position:absolute;top:-180px;width:260px;height:900px;z-index:1;pointer-events:none;
+  clip-path:polygon(47% 0,53% 0,100% 100%,0 100%);
+  background:linear-gradient(180deg,rgba(255,255,255,.19),rgba(255,43,166,.05),transparent);
+  filter:blur(4px);opacity:0
+}
+.casinoLobby.megaShow .danceBeam{opacity:1}
+.beam1{left:16%;animation:beamDance 1.2s ease-in-out infinite alternate}
+.beam2{right:16%;animation:beamDance2 1.4s ease-in-out infinite alternate}
+@keyframes beamDance{from{transform:rotate(-20deg)}to{transform:rotate(20deg)}}
+@keyframes beamDance2{from{transform:rotate(20deg)}to{transform:rotate(-20deg)}}
+
+/* Candy-saga inspired original presentation */
+.crushBoardWrap{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,.05)),
+    linear-gradient(135deg,#413bc4,#2877db 55%,#53d7f0);
+  border:4px solid #8eeaff;
+  box-shadow:0 0 30px #55dfff88,inset 0 0 40px #fff2;
+}
+.crushBoardPro{
+  background:
+    radial-gradient(circle at 50% 5%,rgba(255,255,255,.23),transparent 25%),
+    linear-gradient(180deg,#7845ce,#2e72ca);
+  border:0;
+  border-radius:28px;
+  padding:18px;
+  box-shadow:inset 0 0 30px #16006066;
+}
+.candyTile{
+  border-radius:16px;
+  background:radial-gradient(circle at 35% 25%,#ffffffaa,transparent 25%),#ffffff14;
+  border:1px solid #ffffff44
+}
+.candyTile.blocker{
+  background:repeating-linear-gradient(45deg,#271d38 0 7px,#e6cde8 7px 11px,#271d38 11px 18px);
+  border:3px solid #17101f;
+  box-shadow:inset 0 0 0 3px #e8cae8;
+}
+.candyTile.blocker:after{content:"✖";font-size:27px;color:#fff;text-shadow:0 0 5px #000}
+.crushMissionBar{
+  display:flex;justify-content:center;gap:28px;align-items:center;
+  max-width:680px;margin:0 auto 14px;padding:12px 18px;border-radius:24px;
+  background:linear-gradient(180deg,#1d1550,#130c36);
+  border:3px solid #86d9ff;box-shadow:0 8px 0 #09051e,0 0 20px #6ad4ff88
+}
+.missionItem{text-align:center;font-weight:1000}.missionItem span{font-size:30px;display:block}
+.starTrack{font-size:26px;color:#7cc8ff;letter-spacing:5px}
+
+/* Added game layouts */
+.megaGame{padding:18px;min-height:720px}
+.bingoLayout,.wordLayout,.chessLayout,.dominoLayout{display:grid;grid-template-columns:1fr 280px;gap:16px}
+.bingoCard{
+  max-width:620px;margin:auto;display:grid;grid-template-columns:repeat(5,1fr);
+  gap:6px;padding:14px;border-radius:24px;background:#10235d;border:4px solid #69dbff
+}
+.bingoCell{
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  border-radius:13px;background:linear-gradient(#fff8dd,#f3b7df);
+  color:#241238;font-weight:1000;font-size:22px;cursor:pointer;border:2px solid white
+}
+.bingoCell.marked{background:linear-gradient(#ffd84e,#ff7c19);color:#421600;transform:scale(.94)}
+.bingoHead{background:linear-gradient(#ff2ba6,#7a20dc);color:#fff;font-size:26px}
+.bingoBall{
+  width:110px;height:110px;border-radius:50%;margin:15px auto;
+  display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:1000;
+  color:#331400;background:radial-gradient(circle at 35% 25%,white,#ffd23b 42%,#f28b00 75%);
+  border:5px solid white;box-shadow:0 0 25px #ffd23b
+}
+
+.wordGrid{
+  display:grid;gap:7px;max-width:650px;margin:auto;padding:14px;
+  border-radius:22px;background:linear-gradient(135deg,#261055,#091f52);border:3px solid #ff69c7
+}
+.wordCell{
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  border-radius:11px;background:linear-gradient(#fff,#d7eaff);color:#141632;
+  font-size:22px;font-weight:1000;cursor:pointer;user-select:none
+}
+.wordCell.selected{background:linear-gradient(#ffd23b,#ff8d19);transform:scale(.94)}
+.wordCell.found{background:linear-gradient(#62f0cf,#11a98c);color:#04251d}
+.wordList{display:flex;flex-wrap:wrap;gap:8px}
+.wordTag{padding:7px 10px;border-radius:999px;background:#0006;border:1px solid #fff3}
+.wordTag.found{text-decoration:line-through;color:#62f0cf}
+
+.chessBoard{
+  max-width:650px;margin:auto;display:grid;grid-template-columns:repeat(8,1fr);
+  border:8px solid #7a4019;border-radius:12px;overflow:hidden;box-shadow:0 18px 35px #0008
+}
+.chessCell{
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  font-size:39px;cursor:pointer;user-select:none
+}
+.chessCell.light{background:#f2d7a4}.chessCell.dark{background:#7c4b2a}
+.chessCell.selected{outline:5px solid #ff2ba6;outline-offset:-5px}
+.chessCell.move{box-shadow:inset 0 0 0 7px #62f0cfaa}
+
+.dominoTable{
+  min-height:500px;padding:22px;border-radius:30px;
+  background:radial-gradient(circle,#13845c,#06412e);border:10px solid #754018;
+  display:flex;flex-direction:column;justify-content:space-between
+}
+.dominoChain{display:flex;gap:5px;justify-content:center;align-items:center;flex-wrap:wrap;min-height:190px}
+.domino{
+  width:54px;height:102px;border-radius:10px;background:#fff8df;color:#111;
+  border:3px solid white;box-shadow:0 7px 12px #0006;display:flex;flex-direction:column;
+  justify-content:space-around;align-items:center;font-weight:1000;font-size:23px;cursor:pointer
+}
+.domino.horizontal{width:102px;height:54px;flex-direction:row}
+.dominoLine{width:80%;height:2px;background:#111}.domino.horizontal .dominoLine{height:80%;width:2px}
+.dominoHand{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;padding:10px}
+.domino.playable{box-shadow:0 0 18px #ffd23b,0 7px 12px #0006}
+@media(max-width:950px){
+  .arcadeMachines{grid-template-columns:repeat(2,1fr)}
+  .bingoLayout,.wordLayout,.chessLayout,.dominoLayout{grid-template-columns:1fr}
+}
+@media(max-width:560px){
+  .arcadeMachines{grid-template-columns:1fr}
+  .bingoCell,.wordCell{font-size:15px}
+  .chessCell{font-size:25px}
+}
+
+
+/* ===== PHASE 6: COIN ENTRY + DAILY BONUS + STORE ===== */
+.coinModal{
+  position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;
+  padding:18px;background:rgba(5,0,12,.84);backdrop-filter:blur(8px)
+}
+.coinModal.show{display:flex}
+.coinPanel{
+  width:min(620px,96vw);max-height:90vh;overflow:auto;padding:24px;border-radius:30px;
+  background:
+    radial-gradient(circle at 20% 5%,rgba(255,210,59,.2),transparent 25%),
+    linear-gradient(180deg,#280334,#0d0012);
+  border:3px solid #ffd23b;box-shadow:0 0 45px #ffd23b88,0 28px 70px #000
+}
+.coinPanel h2{text-align:center;color:#ffd23b;font-size:36px;margin:0 0 10px}
+.coinPanel p{text-align:center;color:#ffe7bd}
+.coinBalanceBig{
+  display:flex;align-items:center;justify-content:center;gap:10px;margin:14px auto;
+  font-size:28px;font-weight:1000;color:#fff2b2
+}
+.coinBalanceBig span:first-child{font-size:44px}
+.entryTicket{
+  padding:16px;border-radius:20px;background:#0007;border:1px solid #fff2;margin:14px 0;text-align:center
+}
+.entryTicket b{display:block;font-size:30px;color:#ffd23b}
+.coinActions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.coinStoreGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px}
+.coinPack{
+  padding:16px;border-radius:20px;background:linear-gradient(135deg,#ffffff18,#ffffff08);
+  border:2px solid #ff2ba6;text-align:center
+}
+.coinPack h3{margin:0;color:#ffd23b;font-size:25px}
+.coinPack p{margin:5px 0 12px}
+.dailyCard{
+  padding:18px;border-radius:22px;text-align:center;margin:14px 0;
+  background:linear-gradient(135deg,#ffe59d,#ffb82d);color:#381500;
+  box-shadow:0 0 24px #ffd23b66
+}
+.dailyCard h3{margin:0 0 5px;font-size:27px}
+.dailyStampRow{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.dailyStamp{
+  width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+  background:#fff7d4;border:2px solid #d58600;font-weight:1000
+}
+.dailyStamp.claimed{background:#62f0cf;color:#04392d}
+.storeNotice{
+  padding:10px;border-radius:14px;background:#0006;color:#ffe8bf;font-size:12px;margin-top:14px;text-align:center
+}
+.lowCoinPulse{animation:lowCoinPulse .75s ease-in-out infinite alternate}
+@keyframes lowCoinPulse{to{transform:scale(1.08);color:#ff7cab;text-shadow:0 0 10px #ff2ba6}}
+.gameCostBadge{
+  position:absolute;right:12px;top:12px;padding:7px 10px;border-radius:999px;
+  background:#0009;border:1px solid #ffd23b;color:#ffd23b;font-size:12px;font-weight:1000;z-index:5
+}
+.machine{position:relative}
+@media(max-width:600px){.coinStoreGrid{grid-template-columns:1fr}}
+
+
+/* ===== REDESIGN V2: CLEARER GAME SCREENS ===== */
+.gameToggleRow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tableTopHud{
+  position:absolute;left:14px;top:14px;z-index:20;padding:9px 12px;border-radius:14px;
+  background:#061624e8;border:2px solid #ffd23b;color:#fff;box-shadow:0 0 16px #ffd23b55
+}
+.spadesArena{
+  min-height:760px;position:relative;border-radius:30px;overflow:hidden;
+  background:radial-gradient(circle at center,#11774e,#04422b 72%);
+  border:12px solid #3b2415;box-shadow:inset 0 0 60px #0009,0 20px 48px #0009
+}
+.spadesPlayer{
+  position:absolute;display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:18px;
+  background:#06151dcc;border:2px solid #ffffff22;min-width:160px
+}
+.spadesPlayer.turn{border-color:#ffd23b;box-shadow:0 0 22px #ffd23b}
+.spAvatar{
+  width:62px;height:62px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:34px;border:3px solid #ffd23b;background:linear-gradient(#ffdb92,#8d4b17)
+}
+.spNorth{top:16px;left:50%;transform:translateX(-50%)}
+.spWest{left:16px;top:43%;transform:translateY(-50%)}
+.spEast{right:16px;top:43%;transform:translateY(-50%)}
+.spSouth{left:50%;bottom:128px;transform:translateX(-50%)}
+.spadesCenter{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:360px;height:290px
+}
+.spPlayed{
+  width:82px;height:118px;border-radius:11px;background:#fff9e6;border:3px solid #fff;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:26px;font-weight:1000;
+  box-shadow:0 10px 18px #0008;position:absolute
+}
+.spPlayed.n{left:139px;top:0}.spPlayed.s{left:139px;bottom:0}.spPlayed.w{left:18px;top:82px}.spPlayed.e{right:18px;top:82px}
+.spadesHand{
+  position:absolute;left:50%;bottom:10px;transform:translateX(-50%);
+  width:min(900px,98%);display:flex;justify-content:center;align-items:end;padding:10px
+}
+.spHandCard{
+  width:70px;height:102px;margin-left:-15px;border-radius:10px;background:#fff9e6;border:3px solid #fff;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;font-weight:1000;font-size:20px;
+  box-shadow:0 9px 16px #0008;cursor:pointer;transition:.16s;transform:rotate(var(--r))
+}
+.spHandCard:first-child{margin-left:0}.spHandCard:hover{transform:translateY(-14px) rotate(var(--r));z-index:12}
+.spHandCard.disabled{opacity:.35;cursor:not-allowed}
+.spadesCaption{
+  position:absolute;left:50%;bottom:122px;transform:translateX(-50%);
+  padding:8px 14px;border-radius:14px;background:#fff4d4;color:#351406;font-weight:900;z-index:22;
+  min-width:260px;text-align:center;display:none
+}
+.spadesCaption.show{display:block}
+
+/* Solitaire */
+.solitairePro{
+  min-height:720px;padding:18px;border-radius:28px;
+  background:repeating-linear-gradient(45deg,#0b5f2e 0 4px,#0a572a 4px 8px);
+  border:8px solid #40250f;box-shadow:inset 0 0 45px #0008
+}
+.solTopBar{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.solSlotPro{
+  width:78px;height:110px;border-radius:10px;border:3px solid #ffffff66;background:#09371f99;
+  display:flex;align-items:center;justify-content:center;font-weight:1000;font-size:18px;cursor:pointer;color:#fff
+}
+.solSlotPro.visible{background:#fff9e6;color:#111;border-color:#fff;box-shadow:0 8px 16px #0007}
+.solGridPro{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.solPilePro{min-height:420px;padding:5px;border-radius:12px;background:#001b0e55}
+.solCardPro{
+  width:68px;height:96px;margin:auto;border-radius:9px;background:#fff9e6;border:3px solid white;
+  color:#111;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:20px;
+  font-weight:1000;box-shadow:0 7px 12px #0008;cursor:pointer
+}
+.solCardPro+.solCardPro{margin-top:-55px}.solBackPro{background:#1488d8;color:#fff}
+.solCardPro.sel{outline:5px solid #ffd23b}
+
+/* UNO */
+.unoArenaPro{
+  min-height:720px;border-radius:30px;padding:18px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#81d9ff,#f8c6ff 50%,#fff1a7);
+  border:8px solid #ffffffaa;color:#16203f
+}
+.unoPlayerPanel{
+  display:flex;align-items:center;gap:10px;padding:9px 13px;border-radius:20px;
+  background:#ffffffdd;border:3px solid #4286e8;box-shadow:0 8px 16px #0004
+}
+.unoTopPlayer{max-width:360px;margin:0 auto}.unoBotSide{position:absolute;right:18px;top:38%}
+.unoAvatar{width:62px;height:62px;border-radius:16px;background:#ffd23b;display:flex;align-items:center;justify-content:center;font-size:34px}
+.unoCenterPro{display:flex;justify-content:center;gap:25px;align-items:center;margin:55px 0 36px}
+.unoCardPro{
+  width:94px;height:142px;border-radius:18px;border:5px solid white;color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:31px;font-weight:1000;
+  box-shadow:0 10px 22px #0006;cursor:pointer
+}
+.unoHandPro{display:flex;justify-content:center;align-items:end;flex-wrap:wrap;max-width:980px;margin:auto}
+.unoHandPro .unoCardPro{margin-left:-16px;transition:.15s}.unoHandPro .unoCardPro:first-child{margin-left:0}
+.unoHandPro .unoCardPro:hover{transform:translateY(-14px);z-index:10}
+.unoEffect{
+  position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);font-size:58px;font-weight:1000;
+  color:#fff;text-shadow:0 0 16px #ff2ba6,0 5px 0 #8a1a64;opacity:0;pointer-events:none
+}
+.unoEffect.show{animation:unoBoom 1s}
+@keyframes unoBoom{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}100%{opacity:0}}
+
+/* Cookie Crush shrinking */
+.crushBoardPro.shrink1{transform:scale(.96)}.crushBoardPro.shrink2{transform:scale(.90)}.crushBoardPro.shrink3{transform:scale(.84)}
+.crushBoardPro{transition:transform .35s ease}
+
+/* Bingo / Word / Chess / Domino polish */
+.bingoTimer{font-size:30px;color:#ffd23b;font-weight:1000;text-align:center;margin:8px 0}
+.wordHintGlow{animation:hintGlow 1.2s ease-in-out 2}
+@keyframes hintGlow{50%{box-shadow:0 0 20px #ffd23b;transform:scale(1.08)}}
+.chessCell.blackPiece{color:#191919;text-shadow:0 1px 0 #fff}.chessCell.whitePiece{color:#fff6da;text-shadow:0 2px 3px #000}
+.dominoTurn{padding:10px;border-radius:14px;background:#0007;color:#ffd23b;text-align:center;font-weight:1000;margin-bottom:10px}
+.longLightShow{animation:longShow 8s ease-in-out}
+@keyframes longShow{
+  0%,100%{filter:brightness(1) saturate(1)}
+  10%{filter:brightness(1.55) saturate(2) hue-rotate(25deg)}
+  20%{filter:brightness(.85) saturate(1.5) hue-rotate(-20deg)}
+  35%{filter:brightness(1.6) saturate(2.2) hue-rotate(55deg)}
+  50%{filter:brightness(1) saturate(1.8) hue-rotate(-40deg)}
+  65%{filter:brightness(1.55) saturate(2.3) hue-rotate(80deg)}
+  80%{filter:brightness(.95) saturate(1.5) hue-rotate(-60deg)}
+}
+
+
+/* ===== REDESIGN V3 ===== */
+.spadesClassic{
+  min-height:760px;border-radius:28px;padding:18px;position:relative;overflow:hidden;
+  background:radial-gradient(circle,#0f7a4e,#03472c 72%);
+  border:12px solid #3b2415;box-shadow:inset 0 0 70px #0008,0 22px 50px #0008
+}
+.spadesClassicHud{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px
+}
+.spadesClassicHud .stat{background:#061c18cc}
+.opponentHand{display:flex;justify-content:center;gap:3px;margin:8px auto 20px}
+.miniBack{width:30px;height:42px;border-radius:5px;background:linear-gradient(135deg,#ff2ba6,#ffd23b);border:1px solid white}
+.spadesCenterClassic{
+  min-height:310px;display:grid;grid-template-columns:repeat(2,100px);gap:20px;align-content:center;justify-content:center
+}
+.spadesCenterClassic .playedCardClassic{
+  width:100px;height:140px;border-radius:12px;background:#fff9e6;border:3px solid #fff;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:32px;font-weight:1000;
+  box-shadow:0 10px 20px #0008
+}
+.spadesClassicHand{display:flex;justify-content:center;align-items:end;flex-wrap:wrap;margin-top:14px}
+.spadesClassicCard{
+  width:76px;height:108px;margin-left:-14px;border-radius:10px;background:#fff9e6;border:3px solid white;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:23px;font-weight:1000;
+  box-shadow:0 9px 16px #0008;cursor:pointer;transition:.15s
+}
+.spadesClassicCard:first-child{margin-left:0}.spadesClassicCard:hover{transform:translateY(-14px);z-index:10}
+.spadesClassicCard.disabled{opacity:.35;cursor:not-allowed}
+.spadesStatus{
+  text-align:center;padding:10px;border-radius:14px;background:#001f18aa;color:#fff4c7;font-weight:900;margin-top:12px
+}
+
+/* true solitaire */
+.solitaireTableV3{
+  min-height:760px;padding:18px;border-radius:28px;
+  background:repeating-linear-gradient(45deg,#0b632f 0 4px,#095728 4px 8px);
+  border:10px solid #3f260f;box-shadow:inset 0 0 50px #0008
+}
+.solTopV3{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
+.solSlotV3{
+  width:82px;height:116px;border-radius:10px;border:3px dashed #ffffff66;background:#083a2099;
+  display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:1000;cursor:pointer
+}
+.solSlotV3.card{background:#fff9e6;color:#111;border-style:solid;border-color:white}
+.solColumnsV3{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.solColumnV3{min-height:430px;padding:5px;border-radius:12px;background:#001b0d55}
+.solCardV3{
+  width:72px;height:102px;margin:auto;border-radius:9px;background:#fff9e6;border:3px solid white;color:#111;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:22px;font-weight:1000;
+  box-shadow:0 7px 14px #0008;cursor:pointer
+}
+.solCardV3+.solCardV3{margin-top:-58px}.solBackV3{background:linear-gradient(135deg,#117fd1,#42b8ff);color:#fff}
+.solCardV3.selected{outline:5px solid #ffd23b}.solColumnV3.target{box-shadow:inset 0 0 0 4px #62f0cf}
+
+/* completely new UNO */
+.colorClash{
+  min-height:720px;padding:20px;border-radius:30px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#2c1e92,#ff4da8 52%,#ffcc4a);border:8px solid #fff8;
+}
+.colorClashTop,.colorClashBottom{
+  display:flex;justify-content:center;align-items:center;gap:14px;padding:12px;border-radius:20px;background:#ffffffdd;color:#17204a
+}
+.colorClashCenter{display:flex;justify-content:center;align-items:center;gap:28px;margin:55px 0 35px}
+.clashCard{
+  width:100px;height:148px;border-radius:18px;border:5px solid white;color:white;
+  display:flex;align-items:center;justify-content:center;font-size:33px;font-weight:1000;box-shadow:0 10px 24px #0007;cursor:pointer
+}
+.clashHand{display:flex;justify-content:center;align-items:end;flex-wrap:wrap;max-width:1000px;margin:auto}
+.clashHand .clashCard{margin-left:-16px;transition:.15s}.clashHand .clashCard:first-child{margin-left:0}
+.clashHand .clashCard:hover{transform:translateY(-14px);z-index:10}
+.clashMeter{height:18px;border-radius:999px;background:#0007;overflow:hidden;margin:12px auto;max-width:650px}
+.clashMeterFill{height:100%;width:50%;background:linear-gradient(90deg,#62f0cf,#ffd23b,#ff2ba6);transition:.3s}
+.clashEffect{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);font-size:64px;font-weight:1000;color:#fff;text-shadow:0 0 18px #ff2ba6;opacity:0}
+.clashEffect.show{animation:clashBoom 1s}@keyframes clashBoom{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}100%{opacity:0}}
+
+/* Bingo */
+.bingoCallerStatus{padding:10px;border-radius:14px;background:#0006;color:#ffd23b;text-align:center;font-weight:900;margin:8px 0}
+
+/* word themes */
+.wordTheme1{background:linear-gradient(135deg,#261055,#091f52)}
+.wordTheme2{background:linear-gradient(135deg,#8a1b5c,#ff8b4d)}
+.wordTheme3{background:linear-gradient(135deg,#064e3b,#0ea5a5)}
+.wordTheme4{background:linear-gradient(135deg,#4c1d95,#2563eb)}
+.wordTheme5{background:linear-gradient(135deg,#7c2d12,#ca8a04)}
+
+/* domino competitive */
+.dominoScoreboard{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.dominoScoreboard .stat{background:#001f18bb}
+.domino.botDomino{background:linear-gradient(#ffe9e9,#ffb2b2)!important;border-color:#ff6262!important}
+
+.unoFourArena{min-height:760px;border-radius:30px;padding:18px;position:relative;overflow:hidden;background:radial-gradient(circle at center,rgba(255,255,255,.72),rgba(255,255,255,.25) 35%,transparent 36%),linear-gradient(135deg,#61e1dc,#f6a7dc 48%,#f7d885);border:8px solid #fff8}.unoSeat{position:absolute;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:18px;background:#ffffffdf;color:#17203e;border:3px solid #4a89e8;box-shadow:0 7px 16px #0004}.unoSeat.top{top:18px;left:50%;transform:translateX(-50%)}.unoSeat.left{left:18px;top:40%;transform:translateY(-50%)}.unoSeat.right{right:18px;top:40%;transform:translateY(-50%)}.unoSeat.bottom{bottom:145px;left:50%;transform:translateX(-50%)}.unoMiniAvatar{width:54px;height:54px;border-radius:14px;background:#ffd23b;display:flex;align-items:center;justify-content:center;font-size:30px}.unoArenaCenter{position:absolute;left:50%;top:45%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:25px}.unoArenaHand{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);display:flex;justify-content:center;align-items:end;width:min(980px,98%)}.unoArenaCard{width:82px;height:122px;border-radius:16px;border:5px solid white;color:white;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:1000;box-shadow:0 9px 20px #0006;cursor:pointer}.unoArenaHand .unoArenaCard{margin-left:-13px;transition:.15s}.unoArenaHand .unoArenaCard:first-child{margin-left:0}.unoArenaHand .unoArenaCard:hover{transform:translateY(-14px);z-index:10}
+/* ===== POLISH FIX: ANIMATION + CLARITY ===== */
+.page.active .game,.page.active .megaGame,.page.active .casinoLobby{
+  animation:pageRise .55s ease-out both
+}
+@keyframes pageRise{
+  from{opacity:0;transform:translateY(18px) scale(.985)}
+  to{opacity:1;transform:none}
+}
+button{transition:transform .14s ease,filter .14s ease}
+button:hover{transform:translateY(-2px) scale(1.02);filter:brightness(1.12)}
+button:active{transform:translateY(1px) scale(.98)}
+.machineScreen,.bingoBall,.clashDiscard,.solSlotV3.card,.domino,.chessCell,.wordCell,.candyTile{
+  will-change:transform,filter,opacity
+}
+.cardDealIn{animation:dealIn .42s ease-out both}
+@keyframes dealIn{
+  from{opacity:0;transform:translateY(-45px) rotate(-8deg) scale(.78)}
+  to{opacity:1;transform:none}
+}
+.playPulse{animation:playPulse .42s ease-out}
+@keyframes playPulse{
+  0%{transform:scale(.84);filter:brightness(1.8)}
+  100%{transform:scale(1);filter:none}
+}
+.fireworkFlash{animation:fireworkFlash .5s ease-out}
+@keyframes fireworkFlash{
+  0%{filter:brightness(2.2) saturate(2);transform:scale(1.02)}
+  100%{filter:none;transform:none}
+}
+.simpleSpadesHud{
+  display:grid!important;
+  grid-template-columns:repeat(3,1fr)!important;
+}
+.simpleSpadesHud .stat:nth-child(4),
+.simpleSpadesHud .stat:nth-child(5),
+.simpleSpadesHud .stat:nth-child(6){display:none!important}
+.spadesLabel{
+  font-size:12px;color:#ffe4a5;letter-spacing:1px
+}
+.spadesValue{
+  font-size:22px;color:#ffd23b;font-weight:1000
+}
+.dominoHelp{
+  padding:12px;border-radius:16px;background:#0006;color:#ffe8bf;line-height:1.45;margin-bottom:10px
+}
+.dominoOpenEnds{
+  display:flex;justify-content:center;gap:12px;margin:10px 0
+}
+.dominoOpenEnds span{
+  padding:8px 12px;border-radius:999px;background:#0008;border:1px solid #ffd23b;color:#ffd23b;font-weight:1000
+}
+
+
+/* ===== MAJOR PLAYABILITY FIX ===== */
+.solCardV3.playable{
+  box-shadow:0 0 0 4px #62f0cf,0 7px 14px #0008;
+}
+.solColumnV3.validTarget{
+  box-shadow:inset 0 0 0 5px #ffd23b,0 0 18px #ffd23b77;
+}
+.solSlotV3.validTarget{
+  box-shadow:0 0 0 5px #ffd23b,0 0 18px #ffd23b77;
+}
+.solMoveMessage{
+  text-align:center;
+  padding:10px;
+  border-radius:14px;
+  background:#001b0dcc;
+  color:#fff4c7;
+  font-weight:900;
+  margin-top:12px;
+}
+
+.unoArenaCard.playable{
+  box-shadow:0 0 0 5px #62f0cf,0 0 22px #62f0cf,0 9px 20px #0006;
+  transform:translateY(-8px);
+}
+.unoArenaCard.disabled{
+  opacity:.45;
+  filter:grayscale(.25);
+}
+.clashTurnBanner{
+  text-align:center;
+  padding:10px 14px;
+  margin:10px auto;
+  max-width:560px;
+  border-radius:16px;
+  background:#ffffffdd;
+  color:#18214a;
+  font-weight:1000;
+  box-shadow:0 6px 14px #0004;
+}
+.clashDrawNotice{
+  position:absolute;
+  left:50%;
+  top:58%;
+  transform:translate(-50%,-50%);
+  padding:10px 16px;
+  border-radius:14px;
+  background:#000b;
+  color:#fff2b2;
+  font-weight:1000;
+  opacity:0;
+  transition:.2s;
+  z-index:12;
+}
+.clashDrawNotice.show{opacity:1}
+
+.dominoSlowPanel{
+  padding:12px;
+  border-radius:16px;
+  background:#0007;
+  color:#fff2b2;
+  text-align:center;
+  font-weight:900;
+  margin-bottom:10px;
+}
+.domino.playable{
+  animation:dominoGlow 1.15s ease-in-out infinite alternate;
+}
+@keyframes dominoGlow{
+  to{box-shadow:0 0 22px #ffd23b,0 7px 12px #0006;transform:translateY(-4px)}
+}
+
+
+
+const STARTER_COIN_AMOUNT=10000;
+const LOW_COIN_THRESHOLD=1000;
+
+function showEntryCoinOffer(){
+  if(!currentUser)return;
+  entryCoinBalance.textContent=state.coins;
+
+  if(state.coins<=0){
+    entryCoinTitle.textContent='You are out of Cookie Coins';
+    entryCoinText.textContent='Buy a coin pack to continue playing.';
+    entryCoinOffer.querySelector('.entryCoinCard').classList.add('lowCoinPulse');
+  }else if(state.coins<=LOW_COIN_THRESHOLD){
+    entryCoinTitle.textContent='Your Cookie Coins are running low';
+    entryCoinText.textContent='You can keep playing, or refill now before the fun stops.';
+    entryCoinOffer.querySelector('.entryCoinCard').classList.add('lowCoinPulse');
+  }else{
+    entryCoinTitle.textContent="Welcome to Cookie's Casino Arcade!";
+    entryCoinText.textContent='You have '+state.coins.toLocaleString()+' Cookie Coins. Buy more now or jump into a game.';
+    entryCoinOffer.querySelector('.entryCoinCard').classList.remove('lowCoinPulse');
+  }
+
+  entryCoinOffer.classList.add('show');
+}
+
+function closeEntryCoinOffer(){
+  entryCoinOffer.classList.remove('show');
+}
+
+function checkLowCoinPrompt(){
+  if(!currentUser)return;
+  if(state.coins<=LOW_COIN_THRESHOLD){
+    setTimeout(showEntryCoinOffer,550);
+  }
+}
+
+/* ===== PLAYER ACCOUNT + SECURE WALLET ===== */
+.authModal,.accountModal{
+  position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;
+  padding:18px;background:rgba(4,0,12,.88);backdrop-filter:blur(8px)
+}
+.authModal.show,.accountModal.show{display:flex}
+.authCard{
+  width:min(540px,96vw);max-height:92vh;overflow:auto;padding:24px;border-radius:30px;
+  background:radial-gradient(circle at 20% 0,rgba(255,210,59,.18),transparent 25%),linear-gradient(180deg,#290337,#0d0014);
+  border:3px solid #ffd23b;box-shadow:0 0 45px #ffd23b66,0 28px 75px #000
+}
+.authCard h2{text-align:center;color:#ffd23b;font-size:34px;margin:0 0 8px}
+.authCard p{text-align:center;color:#ffe8bf}
+.authTabs{display:flex;gap:8px;margin:14px 0}
+.authTabs button{flex:1}
+.authForm{display:grid;gap:10px}
+.authForm label{font-weight:900;color:#ffe8bf}
+.authForm input{
+  width:100%;box-sizing:border-box;padding:12px 14px;border-radius:13px;border:1px solid #ffffff36;
+  background:#0008;color:white;font-size:16px
+}
+.authMessage{min-height:24px;color:#ffd23b;text-align:center;font-weight:900}
+.accountChip{
+  display:flex;align-items:center;gap:8px;padding:7px 11px;border-radius:999px;
+  background:#0008;border:1px solid #ffd23b;color:#ffe8bf;font-weight:900
+}
+.accountAvatar{
+  width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#ff2ba6,#ffd23b);color:#1e0715
+}
+.walletGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.walletTile{padding:13px;border-radius:17px;background:#0007;text-align:center;border:1px solid #ffffff22}
+.walletTile small{display:block;color:#ffe8bf}.walletTile b{font-size:25px;color:#ffd23b}
+.txList{display:grid;gap:8px;max-height:320px;overflow:auto}
+.txRow{display:flex;justify-content:space-between;gap:12px;padding:10px;border-radius:13px;background:#0007}
+.txRow .plus{color:#62f0cf}.txRow .minus{color:#ff8ebd}
+.cloudStatus{
+  padding:6px 9px;border-radius:999px;background:#0007;border:1px solid #ffffff22;
+  color:#ffe8bf;font-size:12px;font-weight:900
+}
+.cloudStatus.online{border-color:#62f0cf;color:#62f0cf}
+.cloudStatus.error{border-color:#ff709e;color:#ff9dbb}
+.lockedArcade{filter:blur(3px);pointer-events:none;user-select:none}
+@media(max-width:600px){.walletGrid{grid-template-columns:1fr}}
+
+
+.infoMiniBtn{
+  width:34px;height:34px;border-radius:50%;padding:0;font-size:17px;font-weight:1000
+}
+.entryCoinOffer{
+  position:fixed;inset:0;z-index:480;display:none;align-items:center;justify-content:center;
+  padding:18px;background:rgba(0,0,0,.82);backdrop-filter:blur(6px)
+}
+.entryCoinOffer.show{display:flex}
+.entryCoinCard{
+  width:min(520px,96vw);padding:24px;border-radius:28px;text-align:center;
+  background:linear-gradient(180deg,#33043e,#13001a);
+  border:3px solid #ffd23b;box-shadow:0 0 45px #ff2ba666
+}
+.entryCoinCard h2{color:#ffd23b;margin:0 0 8px;font-size:32px}
+.entryCoinCard .balanceBig{font-size:42px;font-weight:1000;color:#62f0cf;margin:14px 0}
+.entryCoinCard p{color:#ffe8bf;line-height:1.45}
+.lowCoinPulse{animation:lowCoinPulse .9s ease-in-out infinite alternate}
+@keyframes lowCoinPulse{to{box-shadow:0 0 28px #ff2ba6;transform:scale(1.03)}}
+
+
+/* ===== GAMEPLAY + ANIMATION REBUILD ===== */
+@keyframes gameCardEnter{
+  0%{opacity:0;transform:translateY(-40px) rotate(-8deg) scale(.7)}
+  70%{transform:translateY(5px) rotate(2deg) scale(1.05)}
+  100%{opacity:1;transform:none}
+}
+@keyframes coinPop{
+  0%{transform:scale(1)}
+  35%{transform:scale(1.22);box-shadow:0 0 28px #ffd23b}
+  100%{transform:scale(1)}
+}
+@keyframes turnPulse{
+  from{transform:scale(1);box-shadow:0 0 8px #62f0cf}
+  to{transform:scale(1.04);box-shadow:0 0 30px #62f0cf}
+}
+@keyframes bingoMark{
+  0%{transform:scale(.25) rotate(-25deg);opacity:.2}
+  70%{transform:scale(1.18) rotate(4deg)}
+  100%{transform:scale(1);opacity:1}
+}
+@keyframes winnerFlash{
+  0%,100%{filter:brightness(1)}
+  50%{filter:brightness(1.7);transform:scale(1.02)}
+}
+.cardDealIn,.playedCardClassic,.unoArenaCard,.domino{
+  animation:gameCardEnter .34s ease-out both
+}
+.coinPulse{animation:coinPop .65s ease}
+.turnPulse{animation:turnPulse .8s ease-in-out infinite alternate}
+.bigTurnOverlay{
+  position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);
+  z-index:30;padding:16px 28px;border-radius:20px;
+  background:#090014e8;border:3px solid #ffd23b;color:#ffd23b;
+  font-size:28px;font-weight:1000;box-shadow:0 0 35px #ff2ba699;
+  display:none;pointer-events:none
+}
+.bigTurnOverlay.show{display:block}
+.gameActionFeed{
+  min-height:44px;padding:10px 14px;border-radius:15px;background:#0008;
+  color:#ffe8bf;text-align:center;font-weight:900;margin:10px 0
+}
+.bingoShowdown{
+  border-radius:26px;padding:18px;
+  background:
+    linear-gradient(#0003,#0003),
+    radial-gradient(circle at 50% 0,#8fe9ff 0,#62c9ff 22%,#efb963 55%,#ae6632 100%);
+  border:3px solid #ffd23b
+}
+.bingoTopRail{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:8px;
+  padding:10px;border-radius:18px;background:linear-gradient(180deg,#6d3c14,#2b1608);
+  border:2px solid #e9bc61;margin-bottom:12px
+}
+.bingoInventory{text-align:center;color:white;font-weight:1000}
+.bingoInventory span{display:block;font-size:25px}
+.bingoShowdownHud{
+  display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:10px;align-items:center;
+  margin:10px 0
+}
+.bingoCountdown,.bingoCurrentBall,.bingoRewardBox{
+  padding:12px;border-radius:18px;text-align:center;background:#000b;color:white;
+  border:2px solid #ffd23b;font-weight:1000
+}
+.bingoCurrentBall{font-size:34px;color:#ffd23b}
+.bingoCardsWrap{display:grid;grid-template-columns:repeat(2,minmax(280px,1fr));gap:18px}
+.showdownCard{padding:12px;border-radius:18px;background:linear-gradient(135deg,#9a5c24,#56300f);border:3px solid #f4d98a}
+.showdownCardTitle{text-align:center;color:white;font-size:20px;font-weight:1000;margin-bottom:8px}
+.showdownGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.showdownCell{
+  min-height:58px;display:flex;align-items:center;justify-content:center;
+  border-radius:8px;background:linear-gradient(180deg,#f7d69a,#bf7d37);
+  border:2px solid #6a3710;color:#241000;font-size:22px;font-weight:1000;
+  cursor:pointer;transition:.18s
+}
+.showdownHead{background:#f5f5f5;color:#be2134;cursor:default}
+.showdownCell.called{outline:3px solid #66eaff}
+.showdownCell.marked{
+  color:white;background:radial-gradient(circle,#ffec73,#ff6b24 62%,#8f1800);
+  animation:bingoMark .35s ease-out both
+}
+.bingoHistory{
+  display:flex;gap:7px;overflow:auto;padding:10px;border-radius:14px;background:#0009;margin:12px 0
+}
+.calledBall{
+  min-width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  color:white;background:linear-gradient(135deg,#ff2ba6,#7620e8);border:2px solid white;font-weight:1000
+}
+.bingoActionRow{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.bingoButton{
+  font-size:24px;padding:14px 34px;background:linear-gradient(#ffe976,#ff9c00);
+  border:3px solid #6a2500
+}
+.unoCenterPlay{
+  display:flex;align-items:center;justify-content:center;gap:18px;margin:12px auto;
+  min-height:170px
+}
+.unoPlayedCard{
+  width:105px;height:145px;border-radius:18px;border:4px solid white;
+  display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:1000;
+  box-shadow:0 12px 28px #0009
+}
+.dominoLayout{position:relative}
+.dominoTurnStrong{
+  font-size:26px!important;padding:14px!important;text-align:center;
+  border:3px solid #62f0cf!important
+}
+@media(max-width:850px){
+  .bingoCardsWrap{grid-template-columns:1fr}
+  .bingoShowdownHud{grid-template-columns:1fr}
+}
+
+</style>
+</head>
+<body>
+
+<div class="coinModal" id="gameEntryModal">
+  <div class="coinPanel">
+    <h2 id="entryGameTitle">Enter Game</h2>
+    <div class="coinBalanceBig"><span>🪙</span><span id="entryCoinBalance">0</span> Coins</div>
+    <div class="entryTicket">
+      Game Entry
+      <b><span id="entryCost">0</span> Coins</b>
+      <span id="entryGameMessage">Play a round and earn more coins.</span>
+    </div>
+    <div class="coinActions">
+      <button onclick="confirmGameEntry()">Play Now</button>
+      <button onclick="openCoinStore()">Get More Coins</button>
+      <button onclick="closeCoinModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="coinModal" id="coinStoreModal">
+  <div class="coinPanel">
+    <h2>Cookie Coin Store</h2>
+    <div class="coinBalanceBig"><span>🪙</span><span id="storeCoinBalance">0</span> Coins</div>
+
+    <div class="storeNotice"><b>Coins are purchased through secure checkout.</b><br>No free coin packs are added from this screen.</div><div class="coinStoreGrid">
+      <div class="coinPack">
+        <h3>500 Coins</h3>
+        <p>Starter Pack</p>
+        <button onclick="startCoinCheckout('starter')">$1.99 Checkout</button>
+      </div>
+      <div class="coinPack">
+        <h3>1,200 Coins</h3>
+        <p>Player Pack</p>
+        <button onclick="startCoinCheckout('player')">$3.99 Checkout</button>
+      </div>
+      <div class="coinPack">
+        <h3>3,000 Coins</h3>
+        <p>High Roller Pack</p>
+        <button onclick="startCoinCheckout('high_roller')">$7.99 Checkout</button>
+      </div>
+      <div class="coinPack">
+        <h3>7,500 Coins</h3>
+        <p>VIP Pack</p>
+        <button onclick="startCoinCheckout('vip')">$14.99 Checkout</button>
+      </div>
+    </div>
+
+    <div class="coinActions" style="margin-top:16px">
+      <button onclick="closeCoinStore()">Close Store</button>
+    </div>
+
+    <div class="storeNotice">Secure checkout is handled by Stripe. Purchased coins are added only after payment confirmation.</div>
+  </div>
+</div>
+
+
+
+<div class="entryCoinOffer" id="entryCoinOffer">
+  <div class="entryCoinCard">
+    <h2 id="entryCoinTitle">Welcome to Cookie's Arcade!</h2>
+    <p id="entryCoinText">Your Cookie Coin balance is ready.</p>
+    <div class="balanceBig">🪙 <span id="entryCoinBalance">0</span></div>
+    <div class="coinActions">
+      <button onclick="closeEntryCoinOffer()">Keep Playing</button>
+      <button onclick="closeEntryCoinOffer();openCoinStore()">Buy Coins</button>
+    </div>
+    <p><small>Cookie Coins are virtual entertainment credits and have no cash value.</small></p>
+  </div>
+</div>
+
+<div class="authModal" id="authModal">
+  <div class="authCard">
+    <h2>Cookie's Player Account</h2>
+    <p>Sign in to save progress and use your secure Cookie Coin wallet.</p>
+    <div class="authTabs">
+      <button onclick="setAuthMode('login')" id="loginTab">Sign In</button>
+      <button onclick="setAuthMode('signup')" id="signupTab">Create Account</button>
+    </div>
+    <form class="authForm" onsubmit="submitAuth(event)">
+      <div id="usernameField" style="display:none">
+        <label for="authUsername">Player Name</label>
+        <input id="authUsername" maxlength="24" placeholder="CookieFan23">
+      </div>
+      <label for="authEmail">Email</label>
+      <input id="authEmail" type="email" required autocomplete="email" placeholder="you@example.com">
+      <label for="authPassword">Password</label>
+      <input id="authPassword" type="password" required minlength="8" autocomplete="current-password" placeholder="At least 8 characters">
+      <button type="submit" id="authSubmitBtn">Sign In</button>
+    </form>
+    <div class="authMessage" id="authMessage"></div>
+    <div class="coinActions">
+      <button onclick="sendPasswordReset()">Reset Password</button>
+      <button onclick="closeAuthModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="accountModal" id="accountModal">
+  <div class="authCard">
+    <h2>My Player Account</h2>
+    <div class="walletGrid">
+      <div class="walletTile"><small>Cookie Coins</small><b id="accountCoins">0</b></div>
+      <div class="walletTile"><small>VIP Level</small><b id="accountVip">1</b></div>
+      <div class="walletTile"><small>XP</small><b id="accountXp">0</b></div>
+    </div>
+    <form class="authForm" onsubmit="saveProfile(event)">
+      <label for="profileUsername">Player Name</label>
+      <input id="profileUsername" maxlength="24">
+      <label for="profileDisplayName">Display Name</label>
+      <input id="profileDisplayName" maxlength="40">
+      <button type="submit">Save Profile</button>
+    </form>
+    <h3 style="color:#ffd23b">Recent Coin Activity</h3>
+    <div class="txList" id="transactionList"></div>
+    <div class="authMessage" id="accountMessage"></div>
+    <div class="coinActions">
+      <button onclick="openCoinStore();closeAccountModal()">Buy Coins</button>
+      <button onclick="signOutPlayer()">Sign Out</button>
+      <button onclick="closeAccountModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div id="start"><div class="startBox"><div class="logo">Cookie's Casino<span>Arcade</span></div><p>Spades, Solitaire, UNO-style cards, and Cookie Crush in one direct-open arcade.</p><button onclick="startPlayerFlow()">🎰 ENTER</button><div style="margin-top:10px"><span class="cloudStatus" id="startCloudStatus">Connecting to secure player system...</span></div></div></div>
+<div id="toast" class="toast"></div>
+<span id="cloudStatus" style="display:none"></span><span id="xp" style="display:none">0</span>
+<div id="app" class="app">
+<header class="top card"><div class="brand">🍪 Cookie's Casino Arcade</div><div class="bank"><div class="badge" id="coinBadge">🪙 Coins: <span id="coins">0</span></div><button onclick="openCoinStore()">Coin Store</button><button onclick="openAccountModal()" id="accountBtn">My Account</button><span class="accountChip" id="accountChip"><span class="accountAvatar">🍪</span><span id="accountChipName">Guest</span></span><div class="badge" title="VIP is your arcade level. Your level rises as you earn XP.">VIP: <span id="vip">1</span></div></div></header>
+<nav class="nav"><button onclick="show('lobby')">Lobby</button><button onclick="openSpades()">Spades</button><button onclick="openSolitaire()">Solitaire</button><button onclick="openUno()">UNO</button><button onclick="openCrushPro()">Cookie Crush</button><button onclick="openBingo()">Bingo</button><button onclick="openWordPuzzle()">Word Puzzle</button><button onclick="openChess()">Chess</button><button onclick="openDominoes()">Dominoes</button><button onclick="toggleSound()" id="soundBtn">🔊 Sound On</button></nav>
+
+<section id="lobby" class="page active">
+<div class="casinoLobby card">
+  <div class="ceilingLights"></div>
+  <div class="spotlight"></div><div class="danceBeam beam1"></div><div class="danceBeam beam2"></div>
+  <div id="coinRain"></div>
+
+  <div class="neonMarquee walkIn">
+    <div class="small">WELCOME TO THE SWEETEST ARCADE IN TOWN</div>
+    <h1>COOKIE'S CASINO <span>ARCADE</span></h1>
+    <p>Choose a machine, collect Cookie Coins, and light up the casino floor.</p>
+  </div>
+
+  <div class="lobbyWalkway walkIn">
+    <div class="arcadeMachines">
+
+      <div class="machine" style="--machineColor:#ffd23b" onclick="openSpades()">
+        <div class="machineTop">HIGH ROLLERS HALL</div>
+        <div class="machineScreen">
+          <div class="machineIcon">♠️</div>
+          <div class="gameCostBadge">🪙 75</div><div class="machineName">SPADES</div>
+          <div class="machineSub">Cookie Team vs. Opp Team</div>
+        </div>
+        <div class="machineControls"><span class="joystick"></span><span class="machineButtons"><i></i><i></i></span></div>
+      </div>
+
+      <div class="machine" style="--machineColor:#62f0cf" onclick="openSolitaire()">
+        <div class="machineTop">CARD LOUNGE</div>
+        <div class="machineScreen">
+          <div class="machineIcon">🃏</div>
+          <div class="gameCostBadge">🪙 40</div><div class="machineName">SOLITAIRE</div>
+          <div class="machineSub">Build the four foundations</div>
+        </div>
+        <div class="machineControls"><span class="joystick"></span><span class="machineButtons"><i></i><i></i></span></div>
+      </div>
+
+      <div class="machine" style="--machineColor:#ff4b4b" onclick="openUno()">
+        <div class="machineTop">COLOR CLASH ARENA</div>
+        <div class="machineScreen">
+          <div class="machineIcon">🔴</div>
+          <div class="gameCostBadge">🪙 60</div><div class="machineName">UNO</div>
+          <div class="machineSub">Match, draw, and call UNO</div>
+        </div>
+        <div class="machineControls"><span class="joystick"></span><span class="machineButtons"><i></i><i></i></span></div>
+      </div>
+
+      <div class="machine" style="--machineColor:#ff2ba6" onclick="openCrushPro()">
+        <div class="machineTop">COOKIE CRUSH KINGDOM</div>
+        <div class="machineScreen">
+          <div class="machineIcon">🍪</div>
+          <div class="gameCostBadge">🪙 50</div><div class="machineName">COOKIE CRUSH</div>
+          <div class="machineSub">Sweet matches and jackpot combos</div>
+        </div>
+        <div class="machineControls"><span class="joystick"></span><span class="machineButtons"><i></i><i></i></span></div>
+      </div>
+
+    
+      <div class="machine" style="--machineColor:#60dfff" onclick="openBingo()">
+        <div class="machineTop">LUCKY NUMBER ROOM</div>
+        <div class="machineScreen"><div class="machineIcon">🎱</div><div class="gameCostBadge">🪙 45</div><div class="machineName">BINGO</div><div class="machineSub">Mark numbers and chase five in a row</div></div>
+        <div class="machineControls"><span class="joystick"></span><span class="machineButtons"><i></i><i></i></span></div>
+      </div>
+
+      <div class="machine" style="--machineColor:#ff7ad9" onclick="openWordPuzzle()">
+        <div class="machineTop">WORD TREASURE ROOM</div>
+        <div class="machineScreen"><div class="machineIcon">🔤</div><div class="gameCostBadge">🪙 35</div><div class="machineName">WORD PUZZLE</div><div class="machineSub">Find the hidden Cookie words</div></div>
+        <div class="machineControls"><span class="joystick"></span><span class="machineButtons"><i></i><i></i></span></div>
+      </div>
+
+      <div class="machine" style="--machineColor:#f0d496" onclick="openChess()">
+        <div class="machineTop">ROYAL STRATEGY CLUB</div>
+        <div class="machineScreen"><div class="machineIcon">♛</div><div class="gameCostBadge">🪙 60</div><div class="machineName">CHESS</div><div class="machineSub">Play a quick strategy match</div></div>
+        <div class="machineControls"><span class="joystick"></span><span class="machineButtons"><i></i><i></i></span></div>
+      </div>
+
+      <div class="machine" style="--machineColor:#62f0cf" onclick="openDominoes()">
+        <div class="machineTop">DOMINO HOUSE</div>
+        <div class="machineScreen"><div class="machineIcon">🁫</div><div class="gameCostBadge">🪙 50</div><div class="machineName">DOMINOES</div><div class="machineSub">Match ends and empty your hand</div></div>
+        <div class="machineControls"><span class="joystick"></span><span class="machineButtons"><i></i><i></i></span></div>
+      </div>
+</div>
+  </div>
+
+  <div class="lobbyFooter">
+    <button onclick="openCoinStore()">🪙 Buy Cookie Coins</button>
+    <button onclick="lobbyLightShow()">✨ Start Light Show</button>
+    <button onclick="toggleSound()" id="lobbySoundBtn">🔊 Casino Sound On</button>
+  </div>
+</div>
+</section>
+
+<section id="spades" class="page">
+<div class="game card">
+  <div class="gameHead"><h1>♠ Cookie's Classic Spades</h1><div><button onclick="toggleVoice()" id="spadesChatBtn">🗣️ Chat On</button><button onclick="newSpadesPremium()">New Hand</button></div></div>
+  <div class="spadesClassic">
+    <div class="spadesClassicHud simpleSpadesHud">
+      <div class="stat"><small>Cookie Team</small><b id="premiumCookieScore">0</b></div>
+      <div class="stat"><small>Opp Team</small><b id="premiumOppScore">0</b></div>
+      <div class="stat"><small>Cards Played This Round</small><b id="premiumTrickLabel">1</b></div>
+      <div class="stat"><small>Round Number</small><b id="premiumRoundLabel">1</b></div><div class="stat"><small>Goal</small><b>400</b></div>
+    </div>
+    <div class="opponentHand" id="cardsTadda"></div>
+    <div class="spadesCenterClassic" id="premiumTrickZone"></div>
+    <div class="spadesClassicHand" id="premiumPlayerHand"></div>
+    <div class="spadesStatus" id="premiumSpadesMessage">Choose your bid to begin.</div>
+    <div id="premiumBidPanel" class="bidPanel"><h3>Choose Cookie's Bid</h3><div id="premiumBidGrid" class="bidGrid"></div></div>
+    <div hidden>
+      <span id="cookieBags"></span><span id="oppBags"></span>
+      <span id="cookieBidDisplay"></span><span id="sugarBidDisplay"></span><span id="taddaBidDisplay"></span><span id="flipBidDisplay"></span>
+      <span id="cookieBooksPremium"></span><span id="taddaBooksPremium"></span><span id="sugarBooksPremium"></span><span id="flipBooksPremium"></span>
+      <span id="premiumRoundSummary"></span><span id="bookBurst"></span>
+      <div id="seatCookie"></div><div id="seatTadda"></div><div id="seatSugar"></div><div id="seatFlip"></div>
+      <div id="spadesCaption"></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="solitaire" class="page">
+<div class="game card">
+  <div class="gameHead"><h1>🃏 Cookie Solitaire</h1><div><button onclick="solitaireHint()">Hint</button><button onclick="newSolitaire()">New Game</button></div></div>
+  <div class="solHelp"><b>How to play:</b> Click any face-up card or stack. Then click a highlighted column or foundation. Kings move to empty columns.</div>
+  <div class="stats"><div class="stat"><small>Score</small><b id="solScoreFixed">0</b></div><div class="stat"><small>Moves</small><b id="solMovesFixed">0</b></div><div class="stat"><small>Foundation</small><b id="solFoundationFixed">0/52</b></div></div>
+  <div class="solitaireTableV3">
+    <div class="solTopV3">
+      <div id="stock" class="solSlotV3" onclick="drawStock()">🂠</div>
+      <div id="waste" class="solSlotV3" onclick="smartMoveWaste()||selectWaste()" ondblclick="autoWasteFoundation()">Waste</div>
+      <div style="flex:1"></div>
+      <div id="f0" class="solSlotV3" onclick="moveToFoundation(0)">♠</div>
+      <div id="f1" class="solSlotV3" onclick="moveToFoundation(1)">♥</div>
+      <div id="f2" class="solSlotV3" onclick="moveToFoundation(2)">♦</div>
+      <div id="f3" class="solSlotV3" onclick="moveToFoundation(3)">♣</div>
+    </div>
+    <div id="solBoard" class="solColumnsV3"></div>
+  </div>
+  <div id="solLog" class="log">Click the deck to draw.</div><div id="solMoveMessage" class="solMoveMessage">Click a face-up card or stack. Then click a glowing destination.</div>
+</div>
+</section>
+
+<section id="uno" class="page"><div class="game card"><div class="gameHead"><h1>🌈 Cookie Color Clash Arena</h1><button onclick="newColorClashMatch()">New Match</button></div><div class="unoFourArena"><div class="clashTurnBanner" id="clashTurnBanner">Cookie’s turn</div><div class="clashDrawNotice" id="clashDrawNotice">No playable card — draw one</div><div class="unoSeat top"><div class="unoMiniAvatar">💄</div><div><span id="clashTopCount">7</span> cards</div></div><div class="unoSeat left"><div class="unoMiniAvatar">💜</div><div><span id="clashLeftCount">7</span> cards</div></div><div class="unoSeat right"><div class="unoMiniAvatar">😂</div><div><span id="clashRightCount">7</span> cards</div></div><div class="unoSeat bottom"><div class="unoMiniAvatar">🍪</div><div><span id="clashPlayerCount">7</span> cards</div></div><div class="clashEffect" id="clashEffect">CLASH!</div><div class="unoArenaCenter"><div id="clashDeck" class="unoArenaCard" onclick="drawClashCard()" style="background:linear-gradient(135deg,#ff2ba6,#ffd23b)">DRAW</div><div id="clashDiscard" class="unoArenaCard">?</div></div><div id="clashHand" class="unoArenaHand"></div></div><div class="stats"><div class="stat"><small>Cookie Score</small><b id="clashCookieScore">0</b></div><div class="stat"><small>Opponent Score</small><b id="clashBotScore">0</b></div><div class="stat"><small>Round</small><b id="clashRound">1</b></div></div><div id="clashActionFeed" class="gameActionFeed">Cards played will appear here.</div><div id="unoStatus" class="log">Match color or number. First side to win three rounds wins.</div></div></section>
+
+<section id="crush" class="page">
+<div class="crushWorld card">
+  <div class="gameHead">
+    <h1>🍪 Cookie Crush Kingdom</h1>
+    <button onclick="startCrushLevel(true)">Restart Level</button>
+  </div>
+
+  <div class="crushMissionBar"><div class="missionItem"><span>⭐</span><b id="crushMoveBadge">25</b> moves</div><div class="starTrack" id="crushStars">☆ ☆ ☆</div><div class="missionItem"><span>🍫</span><b id="crushBlockBadge">0</b> blockers</div></div><div class="crushStage">
+    <div class="crushBoardWrap" id="crushBoardWrap">
+      <div class="comboBanner" id="comboBanner">SWEET!</div>
+      <div class="crushBoardPro" id="crushBoardPro"></div>
+
+      <div class="levelCompleteOverlay" id="levelCompleteOverlay">
+        <div class="levelCompleteCard">
+          <h2>🍪 LEVEL COMPLETE!</h2>
+          <p id="levelCompleteText">Sweet victory!</p>
+          <button onclick="nextCrushLevel()">Next Level</button>
+        </div>
+      </div>
+    </div>
+
+    <aside class="crushHUD card">
+      <div class="levelBadge">
+        <small>COOKIE CRUSH LEVEL</small>
+        <b id="crushLevel">1</b>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><small>Score</small><b id="crushScorePro">0</b></div>
+        <div class="stat"><small>Moves</small><b id="crushMovesPro">25</b></div>
+        <div class="stat"><small>Combo</small><b id="crushComboPro">x1</b></div>
+        <div class="stat"><small>Coins Earned</small><b id="crushCoinsEarned">0</b></div>
+      </div>
+
+      <div class="progressOuter">
+        <div class="progressInner" id="crushProgress"></div>
+      </div>
+
+      <div class="goalBox">
+        <h3>Level Goal</h3>
+        <div class="goalRow"><span>Target Score</span><b id="targetScore">1800</b></div>
+        <div class="goalRow"><span>Clear Chocolate</span><b id="blockersLeft">0</b></div>
+      </div>
+
+      <div class="levelTheme" id="levelTheme">Classic Cookie Board</div>
+      <div class="powerLegend">
+        <b>Special Cookies</b><br>
+        4 in a row → Striped Cookie<br>
+        5 in a row → Rainbow Cookie<br>
+        L/T match → Cookie Bomb<br>
+        Big cascades → Bonus coins
+      </div>
+
+      <div class="log" id="crushLogPro">
+        Swap neighboring treats to make matches.
+      </div>
+    </aside>
+  </div>
+</div>
+</section>
+
+
+<section id="bingo" class="page">
+  <div class="megaGame card">
+    <div class="gameHead">
+      <h1>🎱 Cookie Bingo Showdown</h1>
+      <button onclick="newBingoShowdown()">New Showdown</button>
+    </div>
+
+    <div class="bingoShowdown">
+      <div class="bingoTopRail">
+        <div class="bingoInventory"><span>🚀</span>Power Shot<br><b id="bingoPowerShots">3</b></div>
+        <div class="bingoInventory"><span>🪙</span>Entry<br><b>45</b></div>
+        <div class="bingoInventory"><span>🔥</span>Streak<br><b id="bingoStreak">0</b></div>
+        <div class="bingoInventory"><span>🏆</span>Wins<br><b id="bingoWins">0</b></div>
+        <div class="bingoInventory"><span>🎁</span>Prize<br><b id="bingoPrize">350</b></div>
+      </div>
+
+      <div class="bingoShowdownHud">
+        <div class="bingoCountdown">NEXT CALL<br><span id="bingoTimer">0:04</span></div>
+        <div class="bingoCurrentBall" id="bingoBall">READY</div>
+        <div class="bingoRewardBox">MARKED<br><span id="bingoMarked">0</span></div>
+      </div>
+
+      <div class="gameActionFeed" id="bingoCallerStatus">Press Start Showdown. Numbers call automatically every four seconds.</div>
+      <div class="bingoHistory" id="bingoHistory"></div>
+
+      <div class="bingoCardsWrap">
+        <div class="showdownCard">
+          <div class="showdownCardTitle">COOKIE CARD 1</div>
+          <div class="showdownGrid" id="bingoCardOne"></div>
+        </div>
+        <div class="showdownCard">
+          <div class="showdownCardTitle">COOKIE CARD 2</div>
+          <div class="showdownGrid" id="bingoCardTwo"></div>
+        </div>
+      </div>
+
+      <div class="bingoActionRow">
+        <button onclick="toggleBingoShowdown()" id="bingoCallerBtn">Start Showdown</button>
+        <button onclick="useBingoPowerShot()">🚀 Power Shot</button>
+        <button class="bingoButton" onclick="claimBingoShowdown()">BINGO!</button>
+      </div>
+
+      <div id="bingoLog" class="log">Start the caller, listen for numbers, and tap matching tiles yourself.</div>
+
+      <!-- compatibility -->
+      <span id="bingoCalls" hidden>0</span>
+      <div id="bingoCard" hidden></div>
+    </div>
+  </div>
+</section>
+
+
+<section id="word" class="page"><div class="megaGame card"><div class="gameHead"><h1>🔤 Cookie Word Treasure</h1><button onclick="newWordPuzzle()">New Puzzle</button></div><div class="wordLayout"><div><div id="wordGrid" class="wordGrid"></div></div><aside class="side card"><h3>Find These Words</h3><div id="wordList" class="wordList"></div><div class="stats"><div class="stat"><small>Found</small><b id="wordFound">0</b></div><div class="stat"><small>Time</small><b id="wordTime">0:00</b></div></div><button onclick="wordPuzzleHint()">Hint</button><button onclick="clearWordSelection()">Clear Selection</button><div id="wordLog" class="log">Select letters in a straight line.</div></aside></div></div></section>
+
+<section id="chess" class="page"><div class="megaGame card"><div class="gameHead"><h1>♛ Cookie Quick Chess</h1><button onclick="newChess()">New Game</button></div><div class="chessLayout"><div id="chessBoard" class="chessBoard"></div><aside class="side card"><div class="stats"><div class="stat"><small>Turn</small><b id="chessTurn">White</b></div><div class="stat"><small>Captured</small><b id="chessCaptured">0</b></div></div><p>Click one of your pieces, then click a highlighted square. This arcade version uses simplified legal movement.</p><div id="chessLog" class="log">White moves first.</div></aside></div></div></section>
+
+<section id="dominoes" class="page"><div class="megaGame card"><div class="gameHead"><h1>🁫 Cookie Domino House</h1><button onclick="newDominoes()">New Round</button></div><div class="dominoLayout"><div id="dominoTurnOverlay" class="bigTurnOverlay">BOT PLAYING...</div><div class="dominoTable"><div class="dominoHelp"><b>How to play:</b> Click a glowing domino that matches either open end. If nothing glows, press Draw Domino.</div><div class="dominoOpenEnds"><span>Left: <b id="dominoLeftEnd">-</b></span><span>Right: <b id="dominoRightEnd">-</b></span></div><div><h3 style="text-align:center">Bot: <span id="dominoBotCount">7</span> dominoes</h3></div><div id="dominoChain" class="dominoChain"></div><div><div id="dominoHand" class="dominoHand"></div></div></div><aside class="side card"><div class="dominoSlowPanel" id="dominoSlowPanel">Step 1: Look at the Left and Right numbers. Step 2: Click a glowing domino that matches.</div><div class="dominoTurn dominoTurnStrong turnPulse" id="dominoTurn">Your turn</div><div class="dominoScoreboard"><div class="stat"><small>Cookie Score</small><b id="dominoCookieScore">0</b></div><div class="stat"><small>Bot Score</small><b id="dominoBotScore">0</b></div><div class="stat"><small>Round</small><b id="dominoRound">1</b></div></div><div class="stats"><div class="stat"><small>Your Hand</small><b id="dominoCount">7</b></div><div class="stat"><small>Rounds Won</small><b id="dominoWins">0</b></div></div><button onclick="drawDomino()">Draw Domino</button><div id="dominoLog" class="log">Match either open end.</div></aside></div></div></section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const state={coins:0,xp:0,vip:1,sound:true,voice:true,music:true};let ctx=null;
+function $(id){return document.getElementById(id)}
+function rand(a){return a[Math.floor(Math.random()*a.length)]}
+
+function toggleVoice(){
+  state.voice=!state.voice;
+  const b=$('voiceBtn');
+  if(b)b.textContent=state.voice?'🗣️ Spades Chat On':'🔇 Spades Chat Off';const sb=$('spadesChatBtn');if(sb)sb.textContent=state.voice?'🗣️ Chat On':'🔇 Chat Off';
+  if(!state.voice){if('speechSynthesis' in window)speechSynthesis.cancel();if(activeVoiceAudio)activeVoiceAudio.pause();}
+}
+const voiceLineMap={
+  "Baby, that card had somewhere to be.":"audio/voices/card_had_somewhere.mp3",
+  "Let’s see who can beat that.":"audio/voices/beat_that.mp3",
+  "Cookie did not come to play around.":"audio/voices/not_playing.mp3",
+  "Girl, you really played that?":"audio/voices/really_played_that.mp3",
+  "I got something for that.":"audio/voices/got_something.mp3",
+  "Partner, I see you.":"audio/voices/partner_i_see_you.mp3",
+  "Baby, don’t celebrate yet.":"audio/voices/dont_celebrate.mp3",
+  "Aunt Flip still got cards.":"audio/voices/still_got_cards.mp3",
+  "Bingo! You win!":"audio/voices/bingo_win.mp3",
+  "Cookie wins the game!":"audio/voices/game_win.mp3"
+};
+let activeVoiceAudio=null;
+function fallbackSpeak(text,playerIndex=0){
+  if(!('speechSynthesis' in window))return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  const voices=speechSynthesis.getVoices();
+  const preferred=voices.find(v=>/aria|jenny|zira|samantha|ava|female/i.test(v.name))||voices.find(v=>/^en-US/i.test(v.lang))||voices[0];
+  if(preferred)u.voice=preferred;
+  u.rate=.91;u.pitch=[1,1.04,1.1,.96][playerIndex]||1;u.volume=1;
+  speechSynthesis.speak(u);
+}
+function speakLine(text,playerIndex=0){
+  if(!state.voice)return;
+  if(activeVoiceAudio){activeVoiceAudio.pause();activeVoiceAudio.currentTime=0}
+  if('speechSynthesis' in window)speechSynthesis.cancel();
+  const src=voiceLineMap[text];
+  if(src){
+    if(activeVoiceAudio)activeVoiceAudio.pause();
+    activeVoiceAudio=new Audio(src);
+    activeVoiceAudio.volume=1;
+    activeVoiceAudio.play().catch(()=>fallbackSpeak(text,playerIndex));
+  }else fallbackSpeak(text,playerIndex);
+}
+
+
+
+
+async function toggleMusic(){
+  state.music=!state.music;
+  const b=$('musicBtn');
+  if(b)b.textContent=state.music?'🎵 Music On':'🎵 Music Off';
+  if(state.music){
+    state.sound=true;
+    const ctx=initAudio();
+    if(ctx&&ctx.state==='suspended')await ctx.resume();
+    stopCasinoMusic();
+    startCasinoMusic();
+    sfx('win');
+  }else{
+    stopCasinoMusic();
+  }
+  saveProgressSnapshot();
+}
+
+
+
+/* ===== VIRTUAL COIN SYSTEM ===== */
+const gameEntryCosts={
+  spades:75,
+  solitaire:40,
+  uno:60,
+  crush:50,
+  bingo:45,
+  word:35,
+  chess:60,
+  dominoes:50
+};
+const gameDisplayNames={
+  spades:"Cookie's Spades",
+  solitaire:"Cookie Solitaire",
+  uno:"Cookie UNO",
+  crush:"Cookie Crush Kingdom",
+  bingo:"Cookie Bingo",
+  word:"Cookie Word Treasure",
+  chess:"Cookie Quick Chess",
+  dominoes:"Cookie Domino House"
+};
+let pendingGameKey=null,pendingGameCallback=null,activeGameKey='lobby';
+
+function loadArcadeProgress(){return}
+
+function saveArcadeProgress(){saveProgressSnapshot()}
+
+function render(){
+  $('coins').textContent=Number(state.coins||0).toLocaleString();
+  $('xp').textContent=state.xp;
+  $('vip').textContent=state.vip;
+  const badge=$('coinBadge');
+  if(badge)badge.classList.toggle('lowCoinPulse',state.coins<50);
+  saveProgressSnapshot();
+}
+
+function reward(c,x=10){
+  state.xp+=Number(x)||0;
+  while(state.xp>=100){state.xp-=100;state.vip++;toast('VIP LEVEL UP!');sfx('win')}
+  render();
+  secureGameReward(Number(c)||0,activeGameKey||'arcade');
+}
+
+function requestGameEntry(key,callback){
+  if(!currentUser){openAuthModal('login');return}
+  pendingGameKey=key;
+  pendingGameCallback=callback;
+  const cost=gameEntryCosts[key]||0;
+  entryGameTitle.textContent=gameDisplayNames[key]||'Enter Game';
+  entryCost.textContent=cost;
+  entryCoinBalance.textContent=state.coins;
+  entryGameMessage.textContent=state.coins>=cost
+    ? 'Your secure wallet will be charged when you press Play Now.'
+    : 'You need more Cookie Coins to play.';
+  gameEntryModal.classList.add('show');
+}
+
+async function confirmGameEntry(){
+  if(!pendingGameKey||!pendingGameCallback)return;
+  const key=pendingGameKey;
+  const cb=pendingGameCallback;
+  const cost=gameEntryCosts[key]||0;
+  try{
+    const result=await secureGameEntry(key);
+    activeGameKey=key;
+    closeCoinModal();
+    cb();
+    setTimeout(()=>{
+      const current=document.getElementById(key);
+      if(current&&!current.classList.contains('active'))show(key);
+    },80);
+    toast('-'+cost+' COINS • GOOD LUCK!');
+    sfx('card');
+  }catch(error){
+    closeCoinModal();
+    if(/balance|coins/i.test(error.message)){showEntryCoinOffer();}
+    toast(error.message.toUpperCase());
+    sfx('bad');
+  }
+}
+
+function closeCoinModal(){
+  gameEntryModal.classList.remove('show');
+  pendingGameKey=null;
+  pendingGameCallback=null;
+}
+
+function openCoinStore(){if(!currentUser){openAuthModal('login');return}
+  gameEntryModal.classList.remove('show');
+  updateCoinStore();
+  coinStoreModal.classList.add('show');
+}
+
+function closeCoinStore(){
+  coinStoreModal.classList.remove('show');
+}
+
+function todayKey(){
+  const d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+function getDailyData(){
+  try{return JSON.parse(localStorage.getItem('cookiesCasinoDaily')||'{}')}catch(e){return{}}
+}
+
+function updateCoinStore(){
+  if(window.storeCoinBalance)storeCoinBalance.textContent=state.coins;
+}
+
+function claimDailyCoins(){toast('Coins are purchased through checkout.')}
+
+
+function cryptoRandomId(){
+  try{const a=new Uint32Array(4);crypto.getRandomValues(a);return Array.from(a).map(x=>x.toString(16)).join('')}
+  catch(e){return Date.now().toString(36)+Math.random().toString(36).slice(2)}
+}
+
+
+
+
+
+/* ===== PLAYER ACCOUNT + SECURE WALLET ===== */
+let supabaseClient=null;
+let currentSession=null;
+let currentUser=null;
+let currentProfile=null;
+let authMode='login';
+let progressSaveTimer=null;
+
+
+
+
+function setCloudStatus(text,type=''){
+  for(const id of ['cloudStatus','startCloudStatus']){
+    const el=$(id);
+    if(!el)continue;
+    el.textContent=text;
+    el.className='cloudStatus'+(type?' '+type:'');
+  }
+}
+
+async function initPlayerCloud(){
+  try{
+    const response=await fetch('/api/public-config');
+    if(!response.ok)throw new Error('Player system is not configured');
+    const config=await response.json();
+    if(!config.supabaseUrl||!config.supabaseAnonKey)throw new Error('Missing public Supabase configuration');
+    supabaseClient=window.supabase.createClient(config.supabaseUrl,config.supabaseAnonKey,{
+      auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
+    });
+    const {data:{session}}=await supabaseClient.auth.getSession();
+    await applyAuthSession(session);
+    supabaseClient.auth.onAuthStateChange((_event,session)=>{
+      setTimeout(()=>applyAuthSession(session),0);
+    });
+    setCloudStatus(session?'Cloud connected':'Sign in required',session?'online':'');
+  }catch(error){
+    setCloudStatus('Deploy to Vercel to enable accounts','error');
+    console.error(error);
+  }
+}
+
+async function applyAuthSession(session){
+  currentSession=session||null;
+  currentUser=session?.user||null;
+  if(!currentUser){
+    currentProfile=null;
+    state.coins=0;
+    accountChipName.textContent='Guest';
+    render();
+    return;
+  }
+  await refreshPlayerAccount();
+
+  // After email confirmation or session restoration, enter automatically.
+  setCloudStatus('Account ready — press ENTER','online');
+}
+
+async function startPlayerFlow(){
+  try{
+    if(!supabaseClient){
+      setCloudStatus('Connecting...','');
+      await initPlayerCloud();
+    }
+
+    if(!currentUser && supabaseClient){
+      const result=await supabaseClient.auth.getSession();
+      if(result.error)throw result.error;
+      if(result.data?.session){
+        currentSession=result.data.session;
+        currentUser=result.data.session.user;
+        await refreshPlayerAccount();
+      }
+    }
+
+    if(!currentUser){
+      openAuthModal('login');
+      return;
+    }
+
+    // Browsers only allow music and sound after a real player click.
+    await activateArcadeAudio();
+    openArcadeScreen();
+    showEntryCoinOffer();
+  }catch(error){
+    console.error(error);
+    openAuthModal('login');
+    authMessage.textContent=error.message||'Please sign in.';
+  }
+}
+
+
+
+
+
+let audioCtx=null;
+let musicTimer=null;
+let musicStep=0;
+
+function initAudio(){
+  if(!audioCtx){
+    const Ctx=window.AudioContext||window.webkitAudioContext;
+    if(!Ctx)return null;
+    audioCtx=new Ctx();
+  }
+  return audioCtx;
+}
+
+function tone(frequency,duration=.08,type='sine',volume=.05,delay=0){
+  if(!state.sound)return;
+  const ctx=initAudio();
+  if(!ctx)return;
+  const start=ctx.currentTime+Math.max(0,delay);
+  const osc=ctx.createOscillator();
+  const gain=ctx.createGain();
+  osc.type=type;
+  osc.frequency.setValueAtTime(frequency,start);
+  gain.gain.setValueAtTime(.0001,start);
+  gain.gain.exponentialRampToValueAtTime(Math.max(.0001,volume),start+.01);
+  gain.gain.exponentialRampToValueAtTime(.0001,start+duration);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start(start);
+  osc.stop(start+duration+.03);
+}
+
+function noiseBurst(duration=.12,volume=.05,delay=0){
+  if(!state.sound)return;
+  const ctx=initAudio();
+  if(!ctx)return;
+  const length=Math.max(1,Math.floor(ctx.sampleRate*duration));
+  const buffer=ctx.createBuffer(1,length,ctx.sampleRate);
+  const data=buffer.getChannelData(0);
+  for(let i=0;i<length;i++)data[i]=(Math.random()*2-1)*(1-i/length);
+  const source=ctx.createBufferSource();
+  const gain=ctx.createGain();
+  const start=ctx.currentTime+delay;
+  source.buffer=buffer;
+  gain.gain.setValueAtTime(volume,start);
+  gain.gain.exponentialRampToValueAtTime(.0001,start+duration);
+  source.connect(gain);
+  gain.connect(ctx.destination);
+  source.start(start);
+}
+
+function sfx(name){
+  if(!state.sound)return;
+  if(name==='enter'){
+    [261,329,392,523].forEach((f,i)=>tone(f,.18,'triangle',.07,i*.07));
+    noiseBurst(.18,.025,.08);
+  }else if(name==='card'||name==='click'){
+    tone(420,.045,'triangle',.045);
+    tone(620,.035,'triangle',.025,.035);
+  }else if(name==='shuffle'){
+    for(let i=0;i<5;i++)noiseBurst(.055,.025,i*.055);
+  }else if(name==='win'){
+    [523,659,784,1046].forEach((f,i)=>tone(f,.18,'triangle',.065,i*.08));
+  }else if(name==='bad'){
+    tone(150,.16,'sawtooth',.055);
+    tone(105,.20,'sawtooth',.05,.09);
+  }else if(name==='crunch'){
+    noiseBurst(.22,.10);
+    tone(90,.18,'square',.08);
+  }else if(name==='uno'){
+    tone(330,.12,'square',.065);
+    tone(660,.14,'triangle',.07,.08);
+  }else{
+    tone(350,.045,'triangle',.025);
+  }
+}
+
+function startCasinoMusic(){
+  if(musicTimer||!state.music)return;
+  const bass=[82.4,98,110,98,123.5,110,98,73.4];
+  musicTimer=setInterval(()=>{
+    if(!state.music||!state.sound)return;
+    const beat=musicStep%16;
+    const b=bass[musicStep%bass.length];
+    tone(b,.20,'sawtooth',.035);
+    if(beat%2===0)tone(b*2,.075,'triangle',.018,.02);
+    if(beat%4===0){
+      tone(523,.06,'triangle',.022,.03);
+      tone(659,.06,'triangle',.018,.07);
+    }
+    if(beat%8===6){
+      tone(1046,.025,'square',.018);
+      noiseBurst(.035,.012,.03);
+    }
+    musicStep++;
+  },330);
+}
+
+function stopCasinoMusic(){
+  if(musicTimer){
+    clearInterval(musicTimer);
+    musicTimer=null;
+  }
+}
+
+async function activateArcadeAudio(){
+  try{
+    const ctx=initAudio();
+    if(ctx&&ctx.state==='suspended')await ctx.resume();
+    state.sound=true;
+    state.music=true;
+    const soundButton=document.getElementById('soundBtn');
+    const musicButton=document.getElementById('musicBtn');
+    if(soundButton)soundButton.textContent='🔊 Sound On';
+    if(musicButton)musicButton.textContent='🎵 Music On';
+    stopCasinoMusic();
+    startCasinoMusic();
+    sfx('enter');
+    saveProgressSnapshot();
+  }catch(error){
+    console.error('Audio could not start:',error);
+  }
+}
+
+function openArcadeScreen(){
+  const startScreen=$('start');
+  const appScreen=$('app');
+
+  if(startScreen)startScreen.style.display='none';
+  if(appScreen)appScreen.style.display='block';
+
+  try{sfx('enter')}catch(error){}
+  try{toast("Welcome to Cookie's Casino Arcade!")}catch(error){}
+  try{createCoinRain()}catch(error){}
+  try{casinoAmbience()}catch(error){}
+  try{render()}catch(error){console.warn(error)}
+  try{checkCheckoutReturn()}catch(error){}
+}
+
+function openAuthModal(mode='login'){
+  setAuthMode(mode);
+  authMessage.textContent='';
+  authModal.classList.add('show');
+}
+function closeAuthModal(){authModal.classList.remove('show')}
+
+function setAuthMode(mode){
+  authMode=mode;
+  usernameField.style.display=mode==='signup'?'block':'none';
+  authSubmitBtn.textContent=mode==='signup'?'Create Account':'Sign In';
+  loginTab.disabled=mode==='login';
+  signupTab.disabled=mode==='signup';
+  authPassword.autocomplete=mode==='signup'?'new-password':'current-password';
+}
+
+async function submitAuth(event){
+  event.preventDefault();
+  if(!supabaseClient){
+    authMessage.textContent='The secure account system needs to be deployed to Vercel first.';
+    return;
+  }
+  const email=authEmail.value.trim();
+  const password=authPassword.value;
+  authMessage.textContent='Please wait...';
+  try{
+    if(authMode==='signup'){
+      const username=authUsername.value.trim();
+      if(username.length<3)throw new Error('Player name must be at least 3 characters.');
+      const {data,error}=await supabaseClient.auth.signUp({
+        email,password,
+        options:{data:{username,display_name:username}}
+      });
+      if(error)throw error;
+      authMessage.textContent=data.session?'Account created!':'Check your email to confirm the account.';
+      if(data.session){closeAuthModal();enterArcade()}
+    }else{
+      const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+      if(error)throw error;
+      authMessage.textContent='Signed in!';
+      closeAuthModal();
+      await applyAuthSession(data.session);
+      setCloudStatus('Signed in — press ENTER','online');
+    }
+  }catch(error){
+    authMessage.textContent=error.message||'Account request failed.';
+  }
+}
+
+async function sendPasswordReset(){
+  if(!supabaseClient){authMessage.textContent='Deploy the player system first.';return}
+  const email=authEmail.value.trim();
+  if(!email){authMessage.textContent='Enter your email first.';return}
+  const {error}=await supabaseClient.auth.resetPasswordForEmail(email,{redirectTo:location.origin});
+  authMessage.textContent=error?error.message:'Password reset email sent.';
+}
+
+async function signOutPlayer(){
+  if(supabaseClient)await supabaseClient.auth.signOut();
+  currentSession=null;currentUser=null;currentProfile=null;state.coins=0;
+  closeAccountModal();
+  $('app').style.display='none';
+  $('start').style.display='flex';
+  accountChipName.textContent='Guest';
+  setCloudStatus('Sign in required','');
+  render();
+}
+
+async function authHeaders(){
+  if(!currentSession?.access_token)throw new Error('Please sign in.');
+  return {'Content-Type':'application/json','Authorization':'Bearer '+currentSession.access_token};
+}
+
+async function secureFetch(url,options={}){
+  const headers=await authHeaders();
+  const response=await fetch(url,{...options,headers:{...headers,...(options.headers||{})}});
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(data.error||'Secure request failed');
+  return data;
+}
+
+async function refreshPlayerAccount(){
+  if(!currentUser)return;
+  try{
+    const data=await secureFetch('/api/account');
+    currentProfile=data.profile||{};
+    state.coins=Number(data.wallet?.coins||0);
+    state.xp=Number(data.progress?.xp||0);
+    state.vip=Number(data.progress?.vip||1);
+    if(data.progress?.settings){
+      state.sound=data.progress.settings.sound!==false;
+      state.music=data.progress.settings.music!==false;
+      state.voice=data.progress.settings.voice!==false;
+    }
+    const name=currentProfile.display_name||currentProfile.username||currentUser.email?.split('@')[0]||'Player';
+    accountChipName.textContent=name;
+    setCloudStatus('Cloud saved','online');
+    render();
+    if($('app')?.style.display==='block')checkLowCoinPrompt();
+  }catch(error){
+    setCloudStatus('Cloud sync error','error');
+    console.error(error);
+  }
+}
+
+async function openAccountModal(){
+  if(!currentUser){openAuthModal('login');return}
+  accountModal.classList.add('show');
+  accountMessage.textContent='Loading...';
+  try{
+    const data=await secureFetch('/api/account');
+    const profile=data.profile||{};
+    profileUsername.value=profile.username||'';
+    profileDisplayName.value=profile.display_name||'';
+    accountCoins.textContent=Number(data.wallet?.coins||0);
+    accountVip.textContent=Number(data.progress?.vip||1);
+    accountXp.textContent=Number(data.progress?.xp||0);
+    transactionList.innerHTML='';
+    const rows=data.transactions||[];
+    if(!rows.length)transactionList.innerHTML='<div class="txRow">No coin activity yet.</div>';
+    rows.forEach(tx=>{
+      const row=document.createElement('div');
+      row.className='txRow';
+      const amount=Number(tx.amount||0);
+      row.innerHTML='<span><b>'+escapeHtml(tx.type||'transaction')+'</b><br><small>'+new Date(tx.created_at).toLocaleString()+'</small></span><b class="'+(amount>=0?'plus':'minus')+'">'+(amount>=0?'+':'')+amount+'</b>';
+      transactionList.appendChild(row);
+    });
+    accountMessage.textContent='';
+  }catch(error){accountMessage.textContent=error.message}
+}
+function closeAccountModal(){accountModal.classList.remove('show')}
+
+function escapeHtml(value){
+  return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function saveProfile(event){
+  event.preventDefault();
+  accountMessage.textContent='Saving...';
+  try{
+    const data=await secureFetch('/api/profile',{
+      method:'POST',
+      body:JSON.stringify({
+        username:profileUsername.value.trim(),
+        displayName:profileDisplayName.value.trim()
+      })
+    });
+    currentProfile=data.profile;
+    accountChipName.textContent=currentProfile.display_name||currentProfile.username;
+    accountMessage.textContent='Profile saved.';
+  }catch(error){accountMessage.textContent=error.message}
+}
+
+function walletRequestId(prefix){
+  return prefix+'_'+Date.now()+'_'+cryptoRandomId();
+}
+
+
+function animateCoinBalance(change){
+  const badge=$('coinBadge');
+  if(!badge)return;
+  badge.classList.remove('coinPulse');
+  void badge.offsetWidth;
+  badge.classList.add('coinPulse');
+
+  const float=document.createElement('div');
+  float.textContent=(change>0?'+':'')+Number(change).toLocaleString()+' COINS';
+  float.style.cssText='position:fixed;right:25px;top:85px;z-index:9999;font-size:25px;font-weight:1000;color:'+(change>0?'#62f0cf':'#ff8ebd')+';text-shadow:0 2px 4px #000;transition:1.2s;pointer-events:none';
+  document.body.appendChild(float);
+  requestAnimationFrame(()=>{
+    float.style.transform='translateY(-65px)';
+    float.style.opacity='0';
+  });
+  setTimeout(()=>float.remove(),1300);
+}
+
+async function secureGameEntry(gameKey){
+  const data=await secureFetch('/api/wallet-transaction',{
+    method:'POST',
+    body:JSON.stringify({
+      action:'game_entry',
+      gameKey,
+      requestId:walletRequestId('entry_'+gameKey)
+    })
+  });
+  state.coins=Number(data.wallet.coins);
+  animateCoinBalance(-(gameEntryCosts[gameKey]||0));
+  render();
+  return data;
+}
+
+async function secureGameReward(coins,gameKey='arcade'){
+  if(!currentUser||!Number.isFinite(Number(coins))||Number(coins)<=0)return;
+  try{
+    const data=await secureFetch('/api/wallet-transaction',{
+      method:'POST',
+      body:JSON.stringify({
+        action:'game_reward',
+        gameKey,
+        coins:Math.floor(Number(coins)),
+        requestId:walletRequestId('reward_'+gameKey)
+      })
+    });
+    state.coins=Number(data.wallet.coins);
+    animateCoinBalance(Number(coins)||0);
+    render();
+  }catch(error){
+    console.warn('Reward was not added:',error.message);
+  }
+}
+
+async function saveProgressSnapshot(){
+  if(!currentUser)return;
+  clearTimeout(progressSaveTimer);
+  progressSaveTimer=setTimeout(async()=>{
+    try{
+      await secureFetch('/api/progress',{
+        method:'POST',
+        body:JSON.stringify({
+          xp:state.xp,
+          vip:state.vip,
+          settings:{sound:state.sound,music:state.music,voice:state.voice}
+        })
+      });
+      setCloudStatus('Cloud saved','online');
+    }catch(error){setCloudStatus('Save failed','error')}
+  },700);
+}
+
+async function startCoinCheckout(packId){
+  if(!currentUser){openAuthModal('login');return}
+  try{
+    const data=await secureFetch('/api/create-checkout-session',{
+      method:'POST',
+      body:JSON.stringify({packId})
+    });
+    location.href=data.url;
+  }catch(error){
+    toast('CHECKOUT COULD NOT START');
+    alert(error.message);
+  }
+}
+
+async function checkCheckoutReturn(){
+  const params=new URLSearchParams(location.search);
+  if(params.get('checkout')==='success'){
+    toast('PAYMENT RECEIVED — SYNCING COINS');
+    setTimeout(refreshPlayerAccount,1200);
+    history.replaceState({},'',location.pathname);
+  }
+}
+
+function enterArcade(){
+  if(!currentUser){
+    openAuthModal('login');
+    return;
+  }
+  openArcadeScreen();
+}
+function casinoAmbience(){
+  if(ambienceTimer)return;
+  ambienceTimer=setInterval(()=>{
+    if(!state.sound)return;
+    if(Math.random()<.28)tone(850+Math.random()*650,.025,'square',.008);
+    if(Math.random()<.18)tone(220+Math.random()*350,.04,'triangle',.009);
+  },470);
+}
+function welcomeBonus(){
+  if(phase1BonusClaimed){toast('Daily Cookie Bonus already claimed');sfx('click');return}
+  phase1BonusClaimed=true;
+  reward(300,30);
+  toast('DAILY COOKIE BONUS<br>+300 COINS');
+  sfx('win');sparks(26);
+}
+function lobbyLightShow(){
+  const lobby=document.querySelector('.casinoLobby');if(!lobby)return;
+  lobby.classList.remove('longLightShow');void lobby.offsetWidth;lobby.classList.add('longLightShow');
+  document.querySelectorAll('.machine').forEach((m,i)=>{setTimeout(()=>m.classList.add('megaFlash'),i*120);setTimeout(()=>m.classList.remove('megaFlash'),7000-i*60)});
+  for(let wave=0;wave<12;wave++)setTimeout(()=>sparks(24),wave*600);
+  const showNotes=[261,329,392,523,659,784,1046,784,659,523,392,329];
+  showNotes.forEach((f,i)=>tone(f,.28,i%3===0?'square':'triangle',.065,i*.35));
+  setTimeout(()=>[98,130,164,196].forEach((f,i)=>tone(f,.8,'sawtooth',.05,i*.12)),700);
+  toast('COOKIE’S MEGA STAR LIGHT SHOW!');
+}
+async function toggleSound(){
+  state.sound=!state.sound;
+  const a=$('soundBtn'),b=$('lobbySoundBtn');
+  if(a)a.textContent=state.sound?'🔊 Sound On':'🔇 Sound Off';
+  if(b)b.textContent=state.sound?'🔊 Casino Sound On':'🔇 Casino Sound Off';
+  if(state.sound){
+    const ctx=initAudio();
+    if(ctx&&ctx.state==='suspended')await ctx.resume();
+    if(state.music)startCasinoMusic();
+    sfx('click');
+  }else{
+    stopCasinoMusic();
+  }
+  saveProgressSnapshot();
+}
+
+const suits=['♠','♥','♦','♣'],ranks=['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+function deck(){let d=[];suits.forEach(s=>ranks.forEach(r=>d.push({s,r,face:true})));return d.sort(()=>Math.random()-.5)}
+function val(c){return ranks.indexOf(c.r)+2}
+function red(c){return c.s==='♥'||c.s==='♦'}
+function htmlCard(c){return '<div>'+c.r+'</div><div>'+c.s+'</div>'}
+
+/* Spades */
+let spHands=[[],[],[],[]],spTrick=[],ct=0,ot=0;
+
+function show(id){
+  document.querySelectorAll('.page').forEach(page=>{
+    page.classList.remove('active');
+    page.style.display='none';
+  });
+  const target=document.getElementById(id);
+  if(!target){console.error('Missing page:',id);return}
+  target.style.display='block';
+  target.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  try{sfx('page')}catch(error){}
+}
+
+function openSpades(){requestGameEntry('spades',()=>{show('spades');newSpadesPremium()})}
+function newSpades(){let d=deck();spHands=[[],[],[],[]];for(let i=0;i<52;i++)spHands[i%4].push(d[i]);spTrick=[];ct=0;ot=0;drawSpades();$('spLog').textContent='Cookie and Sweet Sugar are partners. Play a card to begin.'}
+function drawSpades(){
+ $('cookieTeam').textContent='Cookie Team '+ct;$('oppTeam').textContent='Opp Team '+ot;
+ $('spHand').innerHTML='';spHands[0].forEach((c,i)=>{let e=document.createElement('div');e.className='cardFace '+(red(c)?'red':'black');e.innerHTML=htmlCard(c);e.onclick=()=>playSpades(i);$('spHand').appendChild(e)});
+ $('spTop').innerHTML=spHands[1].map(()=>'<span class="back"></span>').join('');
+ $('spLeft').innerHTML=spHands[2].map(()=>'<span class="back"></span>').join('');
+ $('spRight').innerHTML=spHands[3].map(()=>'<span class="back"></span>').join('');
+ $('spCenter').innerHTML=spTrick.map(c=>'<div class="cardFace '+(red(c)?'red':'black')+'">'+htmlCard(c)+'</div>').join('')
+}
+function winner(cards){let best=0;for(let i=1;i<cards.length;i++){let a=cards[i],b=cards[best];if((a.s==='♠'&&b.s!=='♠')||(a.s===b.s&&val(a)>val(b)))best=i}return best}
+function playSpades(i){spTrick=[spHands[0].splice(i,1)[0],spHands[1].pop(),spHands[2].pop(),spHands[3].pop()];drawSpades();sfx('card');setTimeout(()=>{let w=winner(spTrick);if(w===0||w===2){ct++;toast('COOKIE TEAM WON A BOOK!');reward(50);sfx('win');sparks(10)}else{ot++;toast('OPP TEAM WON A BOOK');sfx('bad')}$('spLog').textContent=(['Cookie','Tadda Redd','Sweet Sugar','Aunt Flip'][w])+' won that book. Score: '+ct+' to '+ot;spTrick=[];drawSpades();if(!spHands[0].length){toast(ct>=ot?'COOKIE TEAM WINS!':'OPP TEAM WINS');if(ct>=ot){reward(250,40);sparks(24)}}},700)}
+
+
+/* ===== PHASE 2 PREMIUM SPADES ===== */
+const premiumNames=['Cookie','Tadda Redd','Sweet Sugar','Aunt Flip'];
+let pDeck=[],pHands=[[],[],[],[]],pPlayed=[],pLead=null,pCurrent=0,pDealer=0,pTrick=1,pHandNum=1,pPlayCount=0,pPartnerRotation=0;
+let pBooks=[0,0,0,0],pBids=[0,0,0,0],pScores=[0,0],pBags=[0,0],pSpadesBroken=false,pWaitingBid=true,pRoundLocked=false;
+
+function cookiePartnerIndex(){return [2,1,3][pPartnerRotation%3]}
+function isCookieTeam(i){return i===0||i===cookiePartnerIndex()}
+function spadesPartnerName(){return premiumNames[cookiePartnerIndex()]}
+function rotateSpadesPartners(){
+  pPartnerRotation=(pPartnerRotation+1)%3;pScores=[0,0];pBags=[0,0];pHandNum=1;
+  toast('NEW PARTNERSHIP!');speakLine('Cookie wins the game!',0);setTimeout(newSpadesPremium,1500)
+}
+
+let premiumWatchdogTimer=null;
+
+function startPremiumWatchdog(){
+  if(premiumWatchdogTimer)clearInterval(premiumWatchdogTimer);
+  premiumWatchdogTimer=setInterval(()=>{
+    const page=$('spades');
+    if(!page||!page.classList.contains('active')||pWaitingBid)return;
+
+    if(pPlayed.length===4&&!pRoundLocked){
+      pRoundLocked=true;
+      setTimeout(resolvePremiumTrick,300);
+      return;
+    }
+
+    if(!pRoundLocked&&pCurrent!==0&&pHands[pCurrent]?.length){
+      premiumSpadesMessage.textContent=premiumNames[pCurrent]+' is choosing a card...';
+      premiumAITurn();
+    }
+  },3200);
+}
+
+function newSpadesPremium(){
+  pDeck=deck();
+  pHands=[[],[],[],[]];
+  for(let i=0;i<52;i++)pHands[i%4].push(pDeck[i]);
+  pHands.forEach(h=>h.sort((a,b)=>suits.indexOf(a.s)-suits.indexOf(b.s)||val(a)-val(b)));
+  pPlayed=[];pLead=null;pCurrent=(pDealer+1)%4;pTrick=1;pBooks=[0,0,0,0];pBids=[0,0,0,0];
+  pSpadesBroken=false;pWaitingBid=true;pRoundLocked=false;pPlayCount=0;
+  pBids[1]=estimateBid(pHands[1]);
+  pBids[2]=estimateBid(pHands[2]);
+  pBids[3]=estimateBid(pHands[3]);
+  buildPremiumBid();
+  premiumBidPanel.style.display='block';
+  premiumSpadesMessage.textContent="Choose Cookie's bid. Sweet Sugar is your partner.";
+  premiumRoundSummary.textContent='Cookie Team '+pScores[0]+' • Opp Team '+pScores[1]+' • Playing to 250';
+  sfx('card');
+  drawPremiumSpades();
+  startPremiumWatchdog();
+}
+
+function estimateBid(hand){
+  let tricks=0;
+  hand.forEach(c=>{
+    if(c.s==='♠'&&val(c)>=11)tricks++;
+    else if(val(c)===14)tricks++;
+    else if(val(c)===13&&hand.filter(x=>x.s===c.s).length<=3)tricks+=.65;
+  });
+  return Math.max(1,Math.min(6,Math.round(tricks)));
+}
+
+function buildPremiumBid(){
+  premiumBidGrid.innerHTML='';
+  for(let i=1;i<=8;i++){
+    let b=document.createElement('button');
+    b.textContent=i;
+    b.onclick=()=>setPremiumBid(i);
+    premiumBidGrid.appendChild(b);
+  }
+}
+
+function setPremiumBid(n){
+  pBids[0]=n;
+  pWaitingBid=false;
+  premiumBidPanel.style.display='none';
+  premiumSpadesMessage.textContent='Bids are in. '+premiumNames[pCurrent]+' leads.';
+  showReaction(0,'I came to win!');
+  setTimeout(()=>showReaction(2,'Partner, let’s get these books.'),850);
+  setTimeout(()=>showReaction(1,'Y’all talking already?'),1700);
+  sfx('click');
+  drawPremiumSpades();
+  if(pCurrent!==0){showThinking(pCurrent);setTimeout(premiumAITurn,1500)}
+}
+
+function premiumLegalCards(pi){
+  let h=pHands[pi];
+  if(pLead&&h.some(c=>c.s===pLead))return h.filter(c=>c.s===pLead);
+  if(!pLead&&!pSpadesBroken&&h.some(c=>c.s!=='♠'))return h.filter(c=>c.s!=='♠');
+  return h.slice();
+}
+
+function premiumCanPlay(pi,c){
+  return premiumLegalCards(pi).includes(c);
+}
+
+function choosePremiumAI(pi){
+  let legal=premiumLegalCards(pi).slice().sort((a,b)=>val(a)-val(b));
+  if(!pPlayed.length)return legal[Math.floor(legal.length*.35)]||legal[0];
+
+  let currentWinner=premiumCurrentWinningIndex();
+  let winningCard=pPlayed[currentWinner].card;
+  let winningOptions=legal.filter(c=>premiumBeats(c,winningCard,pLead));
+  let sameTeamWinning=isCookieTeam(pPlayed[currentWinner].player)===isCookieTeam(pi);
+
+  if(sameTeamWinning)return legal[0];
+  if(winningOptions.length)return winningOptions[0];
+  return legal[0];
+}
+
+function premiumBeats(a,b,lead){
+  if(a.s==='♠'&&b.s!=='♠')return true;
+  if(a.s===b.s&&val(a)>val(b))return true;
+  if(a.s===lead&&b.s!==lead&&b.s!=='♠')return true;
+  return false;
+}
+
+function premiumCurrentWinningIndex(){
+  let best=0;
+  for(let i=1;i<pPlayed.length;i++){
+    if(premiumBeats(pPlayed[i].card,pPlayed[best].card,pLead))best=i;
+  }
+  return best;
+}
+
+function premiumHumanPlay(index){
+  if(pWaitingBid||pRoundLocked||pCurrent!==0)return;
+  let c=pHands[0][index];
+  if(!premiumCanPlay(0,c)){toast('You must follow suit');sfx('bad');return}
+  pHands[0].splice(index,1);
+  premiumPlayCard(0,c);
+}
+
+function premiumAITurn(){
+  if(pRoundLocked||pCurrent===0)return;
+  let c=choosePremiumAI(pCurrent);
+  pHands[pCurrent].splice(pHands[pCurrent].indexOf(c),1);
+  premiumPlayCard(pCurrent,c);
+}
+
+function premiumPlayCard(pi,c){
+  hideThinking();
+  tableChatterAfterPlay(pi);
+  if(!pLead)pLead=c.s;
+  if(c.s==='♠')pSpadesBroken=true;
+  pPlayed.push({player:pi,card:c});
+  sfx('card');
+  drawPremiumSpades();
+
+  if(pPlayed.length===4){
+    pRoundLocked=true;
+    setTimeout(resolvePremiumTrick,2600);
+    return;
+  }
+
+  pCurrent=(pCurrent+1)%4;
+  drawPremiumSpades();
+  if(pCurrent!==0){showThinking(pCurrent);setTimeout(premiumAITurn,1450)}
+}
+
+function resolvePremiumTrick(){
+  hideThinking();
+  let winnerIndex=premiumCurrentWinningIndex();
+  let winner=pPlayed[winnerIndex].player;
+  pBooks[winner]++;
+  let team=isCookieTeam(winner)?0:1;
+  let line=isCookieTeam(winner)
+    ? rand(['That book belongs to us!','Sweet! Keep them books coming!','Cookie Team showed up!'])
+    : rand(['Tadda Redd stole that one!','Aunt Flip said not today!','Opp Team takes the book!']);
+
+  premiumSpadesMessage.textContent=premiumNames[winner]+' won book '+pTrick+'. '+line+' Take a second and watch that score.';
+  showReaction(winner, isCookieTeam(winner)?rand(['That is how you play!','Mmm-hmm!','Book it!','Baby, count that book!']):rand(['You thought!','Gotcha!','Too easy!','Put that on our side!']));
+  showBookBurst(isCookieTeam(winner)?'COOKIE TEAM BOOK!':'OPP TEAM BOOK!');
+  sfx(isCookieTeam(winner)?'win':'click');
+  if(isCookieTeam(winner))sparks(12);
+
+  setTimeout(()=>{
+    pTrick++;
+    pPlayed=[];
+    pLead=null;
+    pCurrent=winner;
+    pRoundLocked=false;
+
+    if(pHands[0].length===0){
+      setTimeout(finishPremiumHand,1800);
+      return;
+    }
+
+    drawPremiumSpades();
+    if(pCurrent!==0){
+      showThinking(pCurrent);
+      setTimeout(premiumAITurn,1700);
+    } else {
+      premiumSpadesMessage.textContent="Cookie, take your time and choose your next card.";
+    }
+  },1800)
+}
+
+function finishPremiumHand(){
+  let partner=cookiePartnerIndex();
+  let cookieBooks=pBooks[0]+pBooks[partner];
+  let oppPlayers=[1,2,3].filter(x=>x!==partner);
+  let oppBooks=pBooks[oppPlayers[0]]+pBooks[oppPlayers[1]];
+  let cookieBid=pBids[0]+pBids[partner];
+  let oppBid=pBids[oppPlayers[0]]+pBids[oppPlayers[1]];
+
+  let cookieMade=cookieBooks>=cookieBid;
+  let oppMade=oppBooks>=oppBid;
+
+  if(cookieMade){
+    pScores[0]+=cookieBid*10;
+    let bags=cookieBooks-cookieBid;
+    pScores[0]+=bags;
+    pBags[0]+=bags;
+  }else pScores[0]-=cookieBid*10;
+
+  if(oppMade){
+    pScores[1]+=oppBid*10;
+    let bags=oppBooks-oppBid;
+    pScores[1]+=bags;
+    pBags[1]+=bags;
+  }else pScores[1]-=oppBid*10;
+
+  if(pBags[0]>=10){pScores[0]-=100;pBags[0]-=10}
+  if(pBags[1]>=10){pScores[1]-=100;pBags[1]-=10}
+
+  let result='Cookie Team: '+cookieBooks+'/'+cookieBid+' • Opp Team: '+oppBooks+'/'+oppBid;
+  premiumRoundSummary.textContent=result+' | Match Score '+pScores[0]+'–'+pScores[1];
+
+  if(cookieMade&&pScores[0]>=pScores[1]){
+    toast('COOKIE TEAM WON THE HAND!');
+    showReaction(0,'Baby, pay us!');
+    showReaction(2,'We did that!');
+    reward(250,40);sfx('win');sparks(26);
+  }else{
+    toast('HAND COMPLETE');
+    sfx('click');
+  }
+
+  if(pScores[0]>=400||pScores[1]>=400){
+    let cookieWins=pScores[0]>pScores[1];
+    setTimeout(()=>{
+      toast(cookieWins?'COOKIE TEAM WINS THE MATCH!':'OPP TEAM WINS THE MATCH!');
+      if(cookieWins){reward(700,90);sfx('enter');sparks(40);setTimeout(rotateSpadesPartners,2200)}
+    },800);
+  }
+
+  pDealer=(pDealer+1)%4;
+  pHandNum++;
+  drawPremiumSpades();
+}
+
+function drawPremiumSpades(){
+  premiumCookieScore.textContent=pScores[0];premiumOppScore.textContent=pScores[1];
+  premiumTrickLabel.textContent=Math.min(pTrick,13);premiumRoundLabel.textContent=pHandNum;
+  cardsTadda.innerHTML=pHands[1].map(()=>'<span class="miniBack"></span>').join('');
+  premiumPlayerHand.innerHTML='';
+  pHands[0].forEach((c,i)=>{
+    let legal=!pWaitingBid&&!pRoundLocked&&pCurrent===0&&premiumCanPlay(0,c);
+    let e=document.createElement('div');e.className='spadesClassicCard '+(red(c)?'red':'black')+(legal?'':' disabled');
+    e.innerHTML=htmlCard(c);e.onclick=()=>{if(legal)premiumHumanPlay(i)};premiumPlayerHand.appendChild(e);
+  });
+  premiumTrickZone.innerHTML='';
+  pPlayed.forEach(p=>{let e=document.createElement('div');e.className='playedCardClassic '+(red(p.card)?'red':'black');e.innerHTML=htmlCard(p.card);premiumTrickZone.appendChild(e)});
+}
+
+
+function showThinking(pi){
+  if(!window.tableThinking)return;
+  const names=['Cookie','Tadda Redd','Sweet Sugar','Aunt Flip'];
+  tableThinking.innerHTML=names[pi]+' is thinking <span class="thinkingDot"></span><span class="thinkingDot"></span><span class="thinkingDot"></span>';
+  tableThinking.classList.add('show');
+  const chatter={
+    1:['Let me see what y’all got...','Hold on, I’m plotting.','Don’t rush me, baby.'],
+    2:['Mmm-hmm... interesting.','Sugar is thinking.','I see the table.'],
+    3:['Now wait a minute...','Aunt Flip got a plan.','Somebody about to get surprised.']
+  };
+  if(chatter[pi])showReaction(pi,rand(chatter[pi]));
+}
+
+function hideThinking(){
+  if(window.tableThinking)tableThinking.classList.remove('show');
+}
+
+function tableChatterAfterPlay(pi){
+  pPlayCount++;
+  if(!state.voice || pPlayCount%3!==0)return;
+  const lines={
+    0:['Baby, that card had somewhere to be.','Let’s see who can beat that.','Cookie did not come to play around.'],
+    1:['Girl, you really played that?','I got something for that.','Okay then, Cookie.'],
+    2:['Partner, I see you.','That was smooth.','Keep it cute and keep it moving.'],
+    3:['Baby, don’t celebrate yet.','Aunt Flip still got cards.','You thought that was the one?']
+  };
+  showReaction(pi,rand(lines[pi]));
+}
+
+function showReaction(pi,text){
+  const cap=$('spadesCaption');
+  if(!cap)return;
+  cap.textContent=text.split(/[.!?]/)[0]+(text.match(/[.!?]/)?text.match(/[.!?]/)[0]:'.');
+  cap.classList.add('show');
+  if(state.voice)speakLine(text,pi);
+  clearTimeout(cap._hideTimer);
+  cap._hideTimer=setTimeout(()=>cap.classList.remove('show'),5000);
+}
+
+function showBookBurst(text){
+  bookBurst.textContent=text;
+  bookBurst.classList.remove('show');
+  void bookBurst.offsetWidth;
+  bookBurst.classList.add('show');
+}
+
+/* Solitaire V4 — fully interactive click-to-move */
+let sd=[],piles=[],found=[[],[],[],[]],waste=[],sel=null,solScoreFixedN=0,solMovesFixedN=0;
+
+function openSolitaire(){
+  requestGameEntry('solitaire',()=>{
+    show('solitaire');
+    setTimeout(newSolitaire,80);
+  });
+}
+
+function buildSolDeck(){
+  let cards=[];
+  for(const s of suits)for(const r of ranks)cards.push({s,r,face:false});
+  return shuffle(cards);
+}
+
+function newSolitaire(){
+  sd=buildSolDeck();
+  piles=[[],[],[],[],[],[],[]];
+  found=[[],[],[],[]];
+  waste=[];
+  sel=null;
+  solScoreFixedN=0;
+  solMovesFixedN=0;
+
+  for(let col=0;col<7;col++){
+    for(let row=0;row<=col;row++){
+      const card=sd.pop();
+      card.face=row===col;
+      piles[col].push(card);
+    }
+  }
+
+  solLog.textContent='Fresh game dealt.';
+  solMoveMessage.textContent='Click a face-up card or stack. Then click a glowing destination.';
+  drawSol();
+  sfx('shuffle');
+}
+
+function validSequence(cards){
+  if(!cards.length)return false;
+  for(let i=0;i<cards.length-1;i++){
+    if(red(cards[i])===red(cards[i+1]))return false;
+    if(val(cards[i])!==val(cards[i+1])+1)return false;
+  }
+  return true;
+}
+
+function selectedCards(){
+  if(!sel)return[];
+  if(sel.type==='waste')return waste.length?[waste[waste.length-1]]:[];
+  return piles[sel.pi].slice(sel.ci);
+}
+
+function clearSelection(){
+  sel=null;
+  drawSol();
+}
+
+function removeSelected(){
+  if(sel.type==='waste'){
+    waste.pop();
+    return;
+  }
+  const source=piles[sel.pi];
+  source.splice(sel.ci);
+  if(source.length && !source[source.length-1].face){
+    source[source.length-1].face=true;
+    solScoreFixedN+=5;
+    sfx('win');
+  }
+}
+
+function canMoveToPile(pi,cards=selectedCards()){
+  if(!cards.length || !validSequence(cards))return false;
+  const target=piles[pi][piles[pi].length-1];
+  const first=cards[0];
+  if(!target)return first.r==='K';
+  return target.face && red(first)!==red(target) && val(first)===val(target)-1;
+}
+
+function canMoveToFoundation(fi,cards=selectedCards()){
+  if(cards.length!==1)return false;
+  const c=cards[0];
+  if(c.s!==suits[fi])return false;
+  const target=found[fi][found[fi].length-1];
+  return (!target && c.r==='A') || (target && val(c)===val(target)+1);
+}
+
+function selectPileCard(pi,ci){
+  const card=piles[pi][ci];
+  if(!card || !card.face)return;
+  const cards=piles[pi].slice(ci);
+  if(!validSequence(cards)){
+    toast('That stack cannot move');
+    sfx('bad');
+    return;
+  }
+  sel={type:'pile',pi,ci};
+  solLog.textContent='Selected '+card.r+card.s+'.';
+  solMoveMessage.textContent='Now click a glowing column or glowing foundation.';
+  drawSol();
+  sfx('click');
+}
+
+function selectWaste(){
+  if(!waste.length)return;
+  sel={type:'waste'};
+  const c=waste[waste.length-1];
+  solLog.textContent='Selected '+c.r+c.s+' from Waste.';
+  solMoveMessage.textContent='Now click a glowing column or glowing foundation.';
+  drawSol();
+  sfx('click');
+}
+
+function moveToPile(pi){
+  if(!sel){
+    if(!piles[pi].length){
+      solMoveMessage.textContent='Select a King before clicking an empty column.';
+    }
+    return;
+  }
+
+  const cards=selectedCards();
+  if(!canMoveToPile(pi,cards)){
+    toast('That column cannot accept this card');
+    sfx('bad');
+    return;
+  }
+
+  removeSelected();
+  piles[pi].push(...cards);
+  solMovesFixedN++;
+  solScoreFixedN+=10;
+  sel=null;
+  solLog.textContent='Moved '+cards[0].r+cards[0].s+' to column '+(pi+1)+'.';
+  solMoveMessage.textContent='Move complete. Select another card.';
+  sfx('card');
+  drawSol();
+}
+
+function moveToFoundation(fi){
+  if(!sel)return;
+  const cards=selectedCards();
+  if(!canMoveToFoundation(fi,cards)){
+    toast('That foundation cannot accept this card');
+    sfx('bad');
+    return;
+  }
+
+  const c=cards[0];
+  removeSelected();
+  found[fi].push(c);
+  solMovesFixedN++;
+  solScoreFixedN+=25;
+  sel=null;
+  solLog.textContent='Moved '+c.r+c.s+' to the '+c.s+' foundation.';
+  solMoveMessage.textContent='Foundation move complete.';
+  sfx('win');
+  drawSol();
+  checkSolWin();
+}
+
+function drawStock(){
+  sel=null;
+  if(sd.length){
+    const c=sd.pop();
+    c.face=true;
+    waste.push(c);
+    solMovesFixedN++;
+    solLog.textContent='Drew '+c.r+c.s+'. Click it to move.';
+    solMoveMessage.textContent='The Waste card can move if a glowing destination appears.';
+    sfx('card');
+  }else if(waste.length){
+    const recycled=[];
+    while(waste.length){
+      const c=waste.pop();
+      c.face=false;
+      recycled.push(c);
+    }
+    sd=recycled;
+    solMovesFixedN++;
+    solLog.textContent='Waste pile recycled.';
+    solMoveMessage.textContent='Click the deck again to draw.';
+    sfx('shuffle');
+  }
+  drawSol();
+}
+
+function autoWasteFoundation(){
+  if(!waste.length)return;
+  sel={type:'waste'};
+  const fi=suits.indexOf(waste[waste.length-1].s);
+  if(canMoveToFoundation(fi))moveToFoundation(fi);
+  else clearSelection();
+}
+
+function drawSol(){
+  const scoreEl=$('solScoreFixed');
+  const movesEl=$('solMovesFixed');
+  const foundationEl=$('solFoundationFixed');
+  const stockEl=$('stock');
+  const wasteEl=$('waste');
+  const boardEl=$('solBoard');
+
+  if(!scoreEl||!movesEl||!foundationEl||!stockEl||!wasteEl||!boardEl)return;
+
+  scoreEl.textContent=solScoreFixedN;
+  movesEl.textContent=solMovesFixedN;
+  foundationEl.textContent=found.reduce((n,p)=>n+p.length,0)+'/52';
+
+  stockEl.textContent=sd.length?'🂠':'↻';
+  stockEl.className='solSlotV3 '+(sd.length?'solBackV3':'');
+
+  const wasteTop=waste[waste.length-1];
+  wasteEl.innerHTML=wasteTop?htmlCard(wasteTop):'Waste';
+  wasteEl.className='solSlotV3'+(wasteTop?' card ':'')+(wasteTop?(red(wasteTop)?'red':'black'):'');
+  if(sel?.type==='waste')wasteEl.classList.add('selected');
+
+  for(let i=0;i<4;i++){
+    const el=$('f'+i);
+    const top=found[i][found[i].length-1];
+    el.innerHTML=top?htmlCard(top):suits[i];
+    el.className='solSlotV3'+(top?' card ':'')+(top?(red(top)?'red':'black'):'');
+    if(sel&&canMoveToFoundation(i))el.classList.add('validTarget');
+  }
+
+  boardEl.innerHTML='';
+  piles.forEach((pile,pi)=>{
+    const col=document.createElement('div');
+    col.className='solColumnV3';
+    if(sel&&canMoveToPile(pi))col.classList.add('validTarget');
+    col.onclick=()=>moveToPile(pi);
+
+    pile.forEach((c,ci)=>{
+      const card=document.createElement('div');
+      const selected=sel?.type==='pile'&&sel.pi===pi&&sel.ci===ci;
+      card.className='solCardV3 cardDealIn '+(c.face?(red(c)?'red':'black'):'solBackV3')+(selected?' selected':'');
+      card.innerHTML=c.face?htmlCard(c):'🂠';
+      card.style.marginTop=ci===0?'0':'-72px';
+      card.style.zIndex=ci+1;
+      card.onclick=ev=>{ev.stopPropagation();selectPileCard(pi,ci)};
+      card.ondblclick=ev=>{
+        ev.stopPropagation();
+        if(ci!==pile.length-1)return;
+        sel={type:'pile',pi,ci};
+        const fi=suits.indexOf(c.s);
+        if(canMoveToFoundation(fi))moveToFoundation(fi);
+        else clearSelection();
+      };
+      col.appendChild(card);
+    });
+    boardEl.appendChild(col);
+  });
+
+  if(!piles.some(p=>p.length)){
+    solLog.textContent='Dealing cards...';
+  }
+}
+
+function solitaireHint(){
+  // Foundation move
+  const candidates=[];
+  if(waste.length)candidates.push({type:'waste',c:waste[waste.length-1],label:'Waste'});
+  piles.forEach((p,pi)=>{
+    if(p.length && p[p.length-1].face){
+      candidates.push({type:'pile',pi,ci:p.length-1,c:p[p.length-1],label:'column '+(pi+1)});
+    }
+  });
+
+  for(const x of candidates){
+    const fi=suits.indexOf(x.c.s);
+    sel=x.type==='waste'?{type:'waste'}:{type:'pile',pi:x.pi,ci:x.ci};
+    if(canMoveToFoundation(fi)){
+      sel=null;
+      solLog.textContent='Hint: move '+x.c.r+x.c.s+' from '+x.label+' to the '+x.c.s+' foundation.';
+      solMoveMessage.textContent='Click that card, then click its glowing foundation.';
+      toast('Foundation move found');
+      return;
+    }
+  }
+
+  // Tableau move
+  for(let from=0;from<piles.length;from++){
+    for(let ci=0;ci<piles[from].length;ci++){
+      const cards=piles[from].slice(ci);
+      if(!cards[0]?.face || !validSequence(cards))continue;
+      for(let to=0;to<piles.length;to++){
+        if(from===to)continue;
+        const tempSel={type:'pile',pi:from,ci};
+        sel=tempSel;
+        const ok=canMoveToPile(to);
+        sel=null;
+        if(ok){
+          solLog.textContent='Hint: move '+cards[0].r+cards[0].s+' from column '+(from+1)+' to column '+(to+1)+'.';
+          solMoveMessage.textContent='Click that card, then click the glowing destination.';
+          toast('Table move found');
+          return;
+        }
+      }
+    }
+  }
+
+  sel=null;
+  solLog.textContent=sd.length?'Hint: draw from the deck.':'Hint: recycle the Waste pile.';
+  solMoveMessage.textContent='No legal table move is available right now.';
+  toast('No move available');
+}
+
+function checkSolWin(){
+  if(found.reduce((n,p)=>n+p.length,0)===52){
+    toast('SOLITAIRE WIN!');
+    reward(500,70);
+    sparks(35);
+    sfx('enter');
+  }
+}
+
+/* Cookie Color Clash V2 — complete turn system */
+const clashColors=['red','blue','green','gold'];
+let clashHandN=[],clashBotN=[],clashDiscardN=null;
+let clashCookieScoreN=0,clashBotScoreN=0,clashRoundN=1;
+let clashBusy=false,clashTurn='cookie',clashDrawnThisTurn=false;
+
+function makeClashCard(){
+  const r=Math.random();
+  const color=rand(clashColors);
+  if(r<.08)return{color:'wild',type:'WILD',num:null};
+  if(r<.17)return{color,type:'+2',num:null};
+  if(r<.25)return{color,type:'SKIP',num:null};
+  if(r<.33)return{color,type:'REVERSE',num:null};
+  return{color,type:'NUM',num:Math.floor(Math.random()*10)};
+}
+
+function clashText(c){
+  return c.type==='NUM'?c.num:c.type;
+}
+
+function openUno(){
+  requestGameEntry('uno',()=>{
+    show('uno');
+    setTimeout(newColorClashMatch,80);
+  });
+}
+
+function newColorClashMatch(){
+  clashCookieScoreN=0;
+  clashBotScoreN=0;
+  clashRoundN=1;
+  startClashRound();
+}
+
+function startClashRound(){
+  clashHandN=Array.from({length:7},makeClashCard);
+  clashBotN=Array.from({length:7},makeClashCard);
+
+  do{
+    clashDiscardN=makeClashCard();
+  }while(clashDiscardN.type!=='NUM');
+
+  clashBusy=false;
+  clashTurn='cookie';
+  clashDrawnThisTurn=false;
+  unoStatus.textContent='Your turn. Play a glowing card or draw one.';
+  drawClash();
+  sfx('shuffle');
+}
+
+function clashValid(c){
+  return c.color==='wild'
+    || c.color===clashDiscardN.color
+    || (c.type==='NUM' && clashDiscardN.type==='NUM' && c.num===clashDiscardN.num)
+    || (c.type!=='NUM' && c.type===clashDiscardN.type);
+}
+
+function chooseClashColor(hand){
+  const counts={red:0,blue:0,green:0,gold:0};
+  hand.forEach(c=>{if(counts[c.color]!==undefined)counts[c.color]++});
+  return Object.keys(counts).sort((a,b)=>counts[b]-counts[a])[0];
+}
+
+function showClashEffect(text){
+  clashEffect.textContent=text;
+  clashEffect.classList.remove('show');
+  void clashEffect.offsetWidth;
+  clashEffect.classList.add('show');
+  sfx('uno');
+}
+
+function updateClashTurnText(){
+  if(clashTurn==='cookie'){
+    clashTurnBanner.textContent='Cookie’s turn';
+    const hasPlay=clashHandN.some(clashValid);
+    clashDrawNotice.classList.toggle('show',!hasPlay);
+  }else{
+    clashTurnBanner.textContent='Opponents are thinking...';
+    clashDrawNotice.classList.remove('show');
+  }
+}
+
+function drawClash(){
+  clashPlayerCount.textContent=clashHandN.length;
+  if(window.clashTopCount)clashTopCount.textContent=Math.ceil(clashBotN.length/3);
+  if(window.clashLeftCount)clashLeftCount.textContent=Math.floor((clashBotN.length+1)/3);
+  if(window.clashRightCount)clashRightCount.textContent=Math.floor((clashBotN.length+2)/3);
+
+  clashCookieScore.textContent=clashCookieScoreN;
+  clashBotScore.textContent=clashBotScoreN;
+  clashRound.textContent=clashRoundN;
+
+  clashDiscard.textContent=clashText(clashDiscardN);
+  clashDiscard.style.background=clashDiscardN.color==='wild'?'linear-gradient(135deg,#f33,#fc0,#1bdb75,#287cff)':clashDiscardN.color;
+  clashDiscard.classList.remove('cardDealIn');
+  void clashDiscard.offsetWidth;
+  clashDiscard.classList.add('cardDealIn');
+
+  clashHand.innerHTML='';
+  clashHandN.forEach((c,i)=>{
+    const e=document.createElement('div');
+    const playable=clashTurn==='cookie'&&!clashBusy&&clashValid(c);
+    e.className='unoArenaCard cardDealIn '+(c.color==='wild'?'wild ':'')+(playable?'playable':'disabled');
+    e.style.background=c.color==='wild'?'linear-gradient(135deg,#f33,#fc0,#1bdb75,#287cff)':c.color;
+    e.textContent=clashText(c);
+    e.onclick=()=>playClash(i);
+    clashHand.appendChild(e);
+  });
+
+  const feed=$('clashActionFeed');
+  if(feed){
+    feed.textContent=clashTurn==='cookie'
+      ? 'YOUR TURN — match the color, number, or action symbol.'
+      : 'OPPONENTS ARE PLAYING — watch the center card.';
+    feed.className='gameActionFeed '+(clashTurn==='cookie'?'turnPulse':'');
+  }
+  updateClashTurnText();
+}
+
+function applyClashAction(card,byCookie){
+  if(card.type==='+2'){
+    const target=byCookie?clashBotN:clashHandN;
+    target.push(makeClashCard(),makeClashCard());
+    showClashEffect('+2');
+    return byCookie?'Opponent draws 2.':'Cookie draws 2.';
+  }
+  if(card.type==='SKIP'){
+    showClashEffect('SKIP!');
+    return byCookie?'Opponent skipped.':'Cookie skipped.';
+  }
+  if(card.type==='REVERSE'){
+    showClashEffect('REVERSE!');
+    return byCookie?'Direction reversed. Cookie plays again.':'Direction reversed. Opponents play again.';
+  }
+  if(card.type==='WILD'){
+    showClashEffect('WILD!');
+    return 'Color changed to '+card.color+'.';
+  }
+  return '';
+}
+
+function playClash(i){
+  if(clashBusy || clashTurn!=='cookie')return;
+
+  const card=clashHandN[i];
+  if(!clashValid(card)){
+    toast('That card cannot be played');
+    sfx('bad');
+    return;
+  }
+
+  clashHandN.splice(i,1);
+  let played={...card};
+  if(played.color==='wild')played.color=chooseClashColor(clashHandN);
+  clashDiscardN=played;
+  clashDrawnThisTurn=false;
+
+  const actionText=applyClashAction(played,true);
+  unoStatus.textContent='Cookie played '+clashText(played)+'. '+actionText;
+  sfx('card');
+
+  if(!clashHandN.length){
+    finishClashRound(true);
+    return;
+  }
+
+  if(played.type==='SKIP' || played.type==='REVERSE'){
+    clashTurn='cookie';
+    drawClash();
+    return;
+  }
+
+  clashTurn='bot';
+  clashBusy=true;
+  drawClash();
+  setTimeout(clashBotTurn,1800);
+}
+
+function drawClashCard(){
+  if(clashBusy || clashTurn!=='cookie')return;
+
+  const card=makeClashCard();
+  clashHandN.push(card);
+  clashDrawnThisTurn=true;
+  unoStatus.textContent='Cookie drew a card. Play it if it glows.';
+  sfx('card');
+  drawClash();
+
+  if(!clashValid(card)){
+    clashTurn='bot';
+    clashBusy=true;
+    drawClash();
+    setTimeout(clashBotTurn,2800);
+  }
+}
+
+function clashBotTurn(){
+  let playable=clashBotN
+    .map((c,i)=>({c,i}))
+    .filter(x=>clashValid(x.c));
+
+  if(!playable.length){
+    clashBotN.push(makeClashCard());
+    unoStatus.textContent='Opponents drew a card.';
+    sfx('card');
+    clashBusy=false;
+    clashTurn='cookie';
+    drawClash();
+    return;
+  }
+
+  playable.sort((a,b)=>{
+    const power=x=>x.c.type==='WILD'?5:x.c.type==='+2'?4:x.c.type==='SKIP'?3:x.c.type==='REVERSE'?2:1;
+    return power(b)-power(a);
+  });
+
+  const choice=playable[0];
+  let played=clashBotN.splice(choice.i,1)[0];
+  if(played.color==='wild')played={...played,color:chooseClashColor(clashBotN)};
+  clashDiscardN=played;
+
+  const actionText=applyClashAction(played,false);
+  unoStatus.textContent='Opponents played '+clashText(played)+'. '+actionText;
+  sfx('card');
+
+  if(!clashBotN.length){
+    finishClashRound(false);
+    return;
+  }
+
+  if(played.type==='SKIP'){
+    clashBusy=true;
+    clashTurn='bot';
+    drawClash();
+    setTimeout(clashBotTurn,2800);
+    return;
+  }
+
+  if(played.type==='REVERSE'){
+    clashBusy=true;
+    clashTurn='bot';
+    drawClash();
+    setTimeout(clashBotTurn,2800);
+    return;
+  }
+
+  clashBusy=false;
+  clashTurn='cookie';
+  drawClash();
+}
+
+function finishClashRound(cookieWon){
+  clashBusy=true;
+  if(cookieWon){
+    clashCookieScoreN++;
+    toast('COOKIE WINS THE ROUND!');
+    reward(180,30);
+    sparks(24);
+    sfx('win');
+  }else{
+    clashBotScoreN++;
+    toast('OPPONENTS WIN THE ROUND');
+    sfx('bad');
+  }
+  drawClash();
+
+  if(clashCookieScoreN>=3 || clashBotScoreN>=3){
+    setTimeout(()=>{
+      if(clashCookieScoreN>=3){
+        toast('COOKIE WINS COLOR CLASH!');
+        reward(500,70);
+        sparks(40);
+        sfx('enter');
+      }else{
+        toast('OPPONENTS WIN THE MATCH');
+      }
+      setTimeout(newColorClashMatch,1800);
+    },1200);
+  }else{
+    clashRoundN++;
+    setTimeout(startClashRound,1800);
+  }
+}
+
+function newUnoMatch(){newColorClashMatch()}
+function callUno(){showClashEffect('CLASH!')}
+function unoChallenge(){showClashEffect('POWER!')}
+
+/* Crush */
+const treats=['🍪','🍬','🍭','🧁','🍫','🍩'];let board=[],selected=null,score=0,mv=30,resolving=false;
+function resetCrush(){board=Array.from({length:64},()=>rand(treats));selected=null;score=0;mv=30;drawCrush()}
+function drawCrush(pop=new Set()){$('crushScore').textContent=score;$('moves').textContent=mv;$('crushBoard').innerHTML='';board.forEach((t,i)=>{let e=document.createElement('div');e.className='gem'+(selected===i?' sel':'')+(pop.has(i)?' pop':'');e.textContent=t;e.onclick=()=>pick(i);$('crushBoard').appendChild(e)})}
+function near(a,b){let ar=Math.floor(a/8),ac=a%8,br=Math.floor(b/8),bc=b%8;return Math.abs(ar-br)+Math.abs(ac-bc)===1}
+function matches(){let m=new Set();for(let r=0;r<8;r++)for(let c=0;c<6;c++){let i=r*8+c;if(board[i]===board[i+1]&&board[i]===board[i+2]){m.add(i);m.add(i+1);m.add(i+2)}}for(let c=0;c<8;c++)for(let r=0;r<6;r++){let i=r*8+c;if(board[i]===board[i+8]&&board[i]===board[i+16]){m.add(i);m.add(i+8);m.add(i+16)}}return m}
+function pick(i){if(resolving||mv<=0)return;if(selected===null){selected=i;drawCrush();return}let a=selected,b=i;selected=null;if(!near(a,b)){drawCrush();return}[board[a],board[b]]=[board[b],board[a]];let m=matches();if(!m.size){[board[a],board[b]]=[board[b],board[a]];toast('No match');drawCrush();return}mv--;resolveMatch(m)}
+function gravity(){for(let c=0;c<8;c++){let vals=[];for(let r=7;r>=0;r--){let v=board[r*8+c];if(v!==null)vals.push(v)}for(let r=7;r>=0;r--)board[r*8+c]=vals[7-r]??rand(treats)}}
+function resolveMatch(m){resolving=true;drawCrush(m);sfx('crunch');sparks(Math.min(20,m.size*2));setTimeout(()=>{let pts=m.size*60;score+=pts;$('crushMessage').textContent='COOKIE CRUSH! +'+pts;m.forEach(i=>board[i]=null);gravity();let again=matches();drawCrush();if(again.size)setTimeout(()=>resolveMatch(again),260);else{resolving=false;if(score>=2000){toast('COOKIE JACKPOT!');reward(300,45);sparks(30)}if(mv<=0&&score<2000)toast('OUT OF MOVES')}},320)}
+render();
+
+/* ===== PHASE 3 PREMIUM COOKIE CRUSH ===== */
+const crushThemes=[
+  {name:'Classic Cookie Board',size:8,treats:['🍪','🍬','🍭','🧁','🍩','🍫']},
+  {name:'Big Cookie Bash',size:7,treats:['🍪','🍪','🍩','🧁','🍫']},
+  {name:'Candy Shop Rush',size:9,treats:['🍬','🍭','🍫','🧁','🍩','🍪','🍓']},
+  {name:'Chocolate Block Party',size:8,treats:['🍫','🍪','🍩','🧁','🍬']},
+  {name:'Mega Cookie Challenge',size:6,treats:['🍪','🍪','🍪','🍫','🧁']}
+];
+let crushLevelN=1,crushBoardN=[],crushSelN=null,crushScoreN=0,crushMovesN=25,crushComboN=1;
+let crushTargetN=1800,crushCoinsN=0,crushBusyN=false,crushSpecialN={},crushBlockersN=new Set();
+let crushSizeN=8,crushTreatSetN=crushThemes[0].treats;
+
+function openCrushPro(){requestGameEntry('crush',()=>{show('crush');setTimeout(()=>startCrushLevel(true),40)})}
+
+function startCrushLevel(force){
+  if(force||!crushBoardN.length){
+    const theme=crushThemes[(crushLevelN-1)%crushThemes.length];
+    crushSizeN=theme.size;
+    crushTreatSetN=theme.treats;
+    crushScoreN=0;
+    crushCoinsN=0;
+    crushComboN=1;
+    crushMovesN=Math.max(16,27-crushLevelN);
+    crushTargetN=1100+(crushLevelN-1)*350;
+    crushSelN=null;
+    crushSpecialN={};
+    crushBlockersN=new Set();
+    crushBoardN=createPlayableCrushBoard();
+    addLevelBlockers();
+    levelCompleteOverlay.classList.remove('show');
+    levelTheme.textContent=theme.name+' • '+crushSizeN+'×'+crushSizeN+' board';
+    crushLogPro.textContent='This level uses a different board size and treat mix.';
+    drawCrushPro();
+  }
+}
+
+function idxRC(r,c){return r*crushSizeN+c}
+function randTreat(){return rand(crushTreatSetN)}
+
+function createPlayableCrushBoard(){
+  let b=[];
+  for(let i=0;i<crushSizeN*crushSizeN;i++){
+    let options=[...new Set(crushTreatSetN)];
+    let row=Math.floor(i/crushSizeN),col=i%crushSizeN;
+    if(col>=2&&b[i-1]===b[i-2])options=options.filter(x=>x!==b[i-1]);
+    if(row>=2&&b[i-crushSizeN]===b[i-crushSizeN*2])options=options.filter(x=>x!==b[i-crushSizeN]);
+    b[i]=rand(options.length?options:crushTreatSetN);
+  }
+  return b;
+}
+
+function addLevelBlockers(){
+  let count=Math.min(Math.floor(crushSizeN*crushSizeN*.18),Math.max(0,crushLevelN-1)*2);
+  while(crushBlockersN.size<count){
+    crushBlockersN.add(Math.floor(Math.random()*crushSizeN*crushSizeN));
+  }
+}
+
+function drawCrushPro(pop=new Set(),drop=false,vanish=false){
+  crushLevel.textContent=crushLevelN;
+  crushScorePro.textContent=crushScoreN;
+  crushMovesPro.textContent=crushMovesN;
+  crushComboPro.textContent='x'+crushComboN;
+  crushCoinsEarned.textContent=crushCoinsN;
+  targetScore.textContent=crushTargetN;
+  blockersLeft.textContent=crushBlockersN.size;if(window.crushMoveBadge)crushMoveBadge.textContent=crushMovesN;if(window.crushBlockBadge)crushBlockBadge.textContent=crushBlockersN.size;if(window.crushStars){let pct=crushScoreN/crushTargetN;crushStars.textContent=pct>=1?'★ ★ ★':pct>=.66?'★ ★ ☆':pct>=.33?'★ ☆ ☆':'☆ ☆ ☆'};
+  crushProgress.style.width=Math.min(100,(crushScoreN/crushTargetN)*100)+'%';
+
+  let pct=crushScoreN/crushTargetN;let shrink=pct>=.75?' shrink3':pct>=.5?' shrink2':pct>=.25?' shrink1':'';crushBoardPro.className='crushBoardPro size'+crushSizeN+shrink;
+  crushBoardPro.innerHTML='';
+  crushBoardN.forEach((t,i)=>{
+    let e=document.createElement('div');
+    if(crushBlockersN.has(i)){
+      e.className='candyTile blocker';
+      crushBoardPro.appendChild(e);
+      return;
+    }
+    let special=crushSpecialN[i]||'';
+    e.className='candyTile'
+      +(crushSelN===i?' selected':'')
+      +(pop.has(i)?(vanish?' vanish':' pop'):'')
+      +(drop?' drop':'')
+      +(special?' '+special:'');
+    e.textContent=special==='rainbow'?'':t;
+    e.onclick=()=>pickCrushPro(i);
+    crushBoardPro.appendChild(e);
+  });
+}
+
+function crushAdjacent(a,b){
+  let ar=Math.floor(a/crushSizeN),ac=a%crushSizeN,br=Math.floor(b/crushSizeN),bc=b%crushSizeN;
+  return Math.abs(ar-br)+Math.abs(ac-bc)===1;
+}
+
+function pickCrushPro(i){
+  if(crushBusyN||crushMovesN<=0||crushBlockersN.has(i))return;
+  if(crushSelN===null){crushSelN=i;drawCrushPro();sfx('click');return}
+  let a=crushSelN,b=i;crushSelN=null;
+  if(!crushAdjacent(a,b)){drawCrushPro();return}
+
+  if(crushSpecialN[a]==='rainbow'||crushSpecialN[b]==='rainbow'){
+    crushMovesN--;activateRainbow(a,b);return;
+  }
+
+  [crushBoardN[a],crushBoardN[b]]=[crushBoardN[b],crushBoardN[a]];
+  [crushSpecialN[a],crushSpecialN[b]]=[crushSpecialN[b],crushSpecialN[a]];
+  let data=findCrushMatchesPro();
+
+  if(!data.matches.size){
+    [crushBoardN[a],crushBoardN[b]]=[crushBoardN[b],crushBoardN[a]];
+    [crushSpecialN[a],crushSpecialN[b]]=[crushSpecialN[b],crushSpecialN[a]];
+    toast('No match');sfx('bad');drawCrushPro();return;
+  }
+  crushMovesN--;crushComboN=1;resolveCrushPro(data,a,b);
+}
+
+function findCrushMatchesPro(){
+  let matches=new Set(),runs=[];
+  for(let r=0;r<crushSizeN;r++){
+    let start=0;
+    for(let c=1;c<=crushSizeN;c++){
+      let same=c<crushSizeN
+        &&crushBoardN[idxRC(r,c)]===crushBoardN[idxRC(r,c-1)]
+        &&!crushBlockersN.has(idxRC(r,c))
+        &&!crushBlockersN.has(idxRC(r,c-1));
+      if(!same){
+        let len=c-start;
+        if(len>=3){
+          let cells=[];
+          for(let k=start;k<c;k++){let x=idxRC(r,k);matches.add(x);cells.push(x)}
+          runs.push({dir:'row',cells});
+        }
+        start=c;
+      }
+    }
+  }
+  for(let c=0;c<crushSizeN;c++){
+    let start=0;
+    for(let r=1;r<=crushSizeN;r++){
+      let same=r<crushSizeN
+        &&crushBoardN[idxRC(r,c)]===crushBoardN[idxRC(r-1,c)]
+        &&!crushBlockersN.has(idxRC(r,c))
+        &&!crushBlockersN.has(idxRC(r-1,c));
+      if(!same){
+        let len=r-start;
+        if(len>=3){
+          let cells=[];
+          for(let k=start;k<r;k++){let x=idxRC(k,c);matches.add(x);cells.push(x)}
+          runs.push({dir:'col',cells});
+        }
+        start=r;
+      }
+    }
+  }
+  return{matches,runs};
+}
+
+function chooseSpecialFromRuns(data,swapA,swapB){
+  let create={};
+  data.runs.forEach(run=>{
+    if(run.cells.length>=5){
+      let cell=run.cells.includes(swapB)?swapB:run.cells.includes(swapA)?swapA:run.cells[Math.floor(run.cells.length/2)];
+      create[cell]='rainbow';
+    }else if(run.cells.length===4){
+      let cell=run.cells.includes(swapB)?swapB:run.cells.includes(swapA)?swapA:run.cells[1];
+      create[cell]=run.dir==='row'?'stripedRow':'stripedCol';
+    }
+  });
+  let counts={};
+  data.runs.forEach(run=>run.cells.forEach(c=>counts[c]=(counts[c]||0)+1));
+  Object.keys(counts).forEach(k=>{if(counts[k]>=2)create[k]='bomb'});
+  return create;
+}
+
+function expandSpecialMatches(matches){
+  let expanded=new Set(matches),queue=[...matches];
+  while(queue.length){
+    let i=queue.shift(),sp=crushSpecialN[i];
+    if(!sp)continue;
+    if(sp==='stripedRow'){
+      let r=Math.floor(i/crushSizeN);
+      for(let c=0;c<crushSizeN;c++){let x=idxRC(r,c);if(!expanded.has(x)){expanded.add(x);queue.push(x)}}
+    }
+    if(sp==='stripedCol'){
+      let c=i%crushSizeN;
+      for(let r=0;r<crushSizeN;r++){let x=idxRC(r,c);if(!expanded.has(x)){expanded.add(x);queue.push(x)}}
+    }
+    if(sp==='bomb'){
+      let r=Math.floor(i/crushSizeN),c=i%crushSizeN;
+      for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){
+        let rr=r+dr,cc=c+dc;
+        if(rr>=0&&rr<crushSizeN&&cc>=0&&cc<crushSizeN){
+          let x=idxRC(rr,cc);if(!expanded.has(x)){expanded.add(x);queue.push(x)}
+        }
+      }
+    }
+  }
+  return expanded;
+}
+
+function activateRainbow(a,b){
+  crushBusyN=true;
+  let rainbow=crushSpecialN[a]==='rainbow'?a:b;
+  let other=rainbow===a?b:a;
+  let target=crushBoardN[other],matches=new Set();
+  crushBoardN.forEach((t,i)=>{if(t===target||i===rainbow)matches.add(i)});
+  showComboBanner('RAINBOW COOKIE!');sfx('win');resolveCrushSet(matches,{});
+}
+
+function resolveCrushPro(data,swapA,swapB){
+  resolveCrushSet(expandSpecialMatches(data.matches),chooseSpecialFromRuns(data,swapA,swapB));
+}
+
+function resolveCrushSet(matches,create){
+  crushBusyN=true;
+  drawCrushPro(matches,false,true);
+  crushBoardWrap.classList.add('boardShake');
+  setTimeout(()=>crushBoardWrap.classList.remove('boardShake'),350);
+
+  let message=crushComboN>=4?'SUGAR RUSH!':crushComboN===3?'DELICIOUS!':crushComboN===2?'SWEET COMBO!':'COOKIE CRUSH!';
+  showComboBanner(message);tone(72,.22,'sawtooth',.12);tone(105,.18,'square',.10,.03);tone(180,.14,'triangle',.09,.07);tone(420,.08,'square',.07,.12);sfx('crunch');sparks(Math.min(36,matches.size*3));setTimeout(()=>sparks(18),160);setTimeout(()=>sparks(16),320);crushBoardWrap.classList.add('fireworkFlash');setTimeout(()=>crushBoardWrap.classList.remove('fireworkFlash'),520);
+
+  setTimeout(()=>{
+    let points=matches.size*75*crushComboN;
+    let coinGain=Math.max(5,Math.floor(points/70));
+    crushScoreN+=points;crushCoinsN+=coinGain;
+
+    matches.forEach(i=>{
+      if(crushBlockersN.has(i))crushBlockersN.delete(i);
+      crushBoardN[i]=null;delete crushSpecialN[i];
+    });
+
+    Object.entries(create).forEach(([k,v])=>{
+      let i=Number(k);crushBoardN[i]=randTreat();crushSpecialN[i]=v;
+    });
+
+    gravityCrushPro();reward(coinGain,Math.max(2,Math.floor(points/300)));
+    crushLogPro.textContent=message+' +'+points+' points and +'+coinGain+' Cookie Coins.';
+    drawCrushPro(new Set(),true);
+
+    setTimeout(()=>{
+      let next=findCrushMatchesPro();
+      if(next.matches.size){crushComboN++;resolveCrushSet(expandSpecialMatches(next.matches),{})}
+      else{crushBusyN=false;crushComboN=1;drawCrushPro();checkCrushLevelEnd()}
+    },700);
+  },850);
+}
+
+function gravityCrushPro(){
+  for(let c=0;c<crushSizeN;c++){
+    let vals=[],specs=[];
+    for(let r=crushSizeN-1;r>=0;r--){
+      let i=idxRC(r,c);
+      if(crushBlockersN.has(i))continue;
+      if(crushBoardN[i]!==null){vals.push(crushBoardN[i]);specs.push(crushSpecialN[i]||'')}
+    }
+    let k=0;
+    for(let r=crushSizeN-1;r>=0;r--){
+      let i=idxRC(r,c);
+      if(crushBlockersN.has(i))continue;
+      crushBoardN[i]=vals[k]??randTreat();
+      if(specs[k])crushSpecialN[i]=specs[k];else delete crushSpecialN[i];
+      k++;
+    }
+  }
+}
+
+function showComboBanner(text){
+  comboBanner.textContent=text;comboBanner.classList.remove('show');void comboBanner.offsetWidth;comboBanner.classList.add('show');
+}
+
+function checkCrushLevelEnd(){
+  if(crushScoreN>=crushTargetN&&crushBlockersN.size===0){
+    let bonus=crushMovesN*25+250;crushCoinsN+=bonus;reward(bonus,60);
+    levelCompleteText.textContent='Level '+crushLevelN+' cleared! Bonus: '+bonus+' Cookie Coins.';
+    levelCompleteOverlay.classList.add('show');toast('LEVEL COMPLETE!');sfx('enter');sparks(40);return;
+  }
+  if(crushMovesN<=0){toast('OUT OF MOVES');crushLogPro.textContent='Restart and try a different strategy.';sfx('bad')}
+}
+
+function nextCrushLevel(){
+  crushLevelN++;levelCompleteOverlay.classList.remove('show');startCrushLevel(true);
+}
+
+/* ===== BINGO ===== */
+
+let bingoTimerN=3,bingoCallerTimer=null,bingoGameTimer=null;
+
+let showdownCards=[[],[]];
+let showdownMarks=[new Set(),new Set()];
+let showdownCalled=new Set();
+let showdownHistory=[];
+let showdownTimer=null;
+let showdownSeconds=4;
+let showdownRunning=false;
+let showdownWins=0;
+let showdownStreak=0;
+let showdownPowerShots=3;
+
+function generateShowdownCard(){
+  const ranges=[[1,15],[16,30],[31,45],[46,60],[61,75]];
+  const cols=[];
+  for(let c=0;c<5;c++){
+    const nums=[];
+    while(nums.length<5){
+      const n=Math.floor(Math.random()*(ranges[c][1]-ranges[c][0]+1))+ranges[c][0];
+      if(!nums.includes(n))nums.push(n);
+    }
+    cols.push(nums.sort((a,b)=>a-b));
+  }
+  return cols;
+}
+
+function newBingoShowdown(){
+  stopBingoShowdown();
+  showdownCards=[generateShowdownCard(),generateShowdownCard()];
+  showdownMarks=[new Set(['2-2']),new Set(['2-2'])];
+  showdownCalled=new Set();
+  showdownHistory=[];
+  showdownSeconds=4;
+  showdownPowerShots=3;
+  bingoBall.textContent='READY';
+  bingoLog.textContent='Press Start Showdown. Numbers call automatically every four seconds.';
+  bingoCallerStatus.textContent='Caller ready. You must mark matching tiles yourself.';
+  renderBingoShowdown();
+}
+
+function renderBingoShowdown(){
+  [bingoCardOne,bingoCardTwo].forEach((root,cardIndex)=>{
+    root.innerHTML='';
+    'BINGO'.split('').forEach(letter=>{
+      const e=document.createElement('div');
+      e.className='showdownCell showdownHead';
+      e.textContent=letter;
+      root.appendChild(e);
+    });
+
+    for(let r=0;r<5;r++){
+      for(let c=0;c<5;c++){
+        const key=r+'-'+c;
+        const cell=document.createElement('div');
+        const number=showdownCards[cardIndex][c][r];
+        cell.className='showdownCell';
+        if(r===2&&c===2){
+          cell.textContent='FREE';
+          cell.classList.add('marked');
+        }else{
+          cell.textContent=number;
+          if(showdownCalled.has(number))cell.classList.add('called');
+        }
+        if(showdownMarks[cardIndex].has(key))cell.classList.add('marked');
+        cell.onclick=()=>markShowdownTile(cardIndex,r,c);
+        root.appendChild(cell);
+      }
+    }
+  });
+
+  bingoMarked.textContent=showdownMarks[0].size+showdownMarks[1].size-2;
+  bingoHistory.innerHTML=showdownHistory.slice(-18).map(n=>{
+    const letter=n<=15?'B':n<=30?'I':n<=45?'N':n<=60?'G':'O';
+    return '<div class="calledBall">'+letter+n+'</div>';
+  }).join('');
+  bingoPowerShots.textContent=showdownPowerShots;
+  bingoWins.textContent=showdownWins;
+  bingoStreak.textContent=showdownStreak;
+}
+
+function markShowdownTile(cardIndex,r,c){
+  const key=r+'-'+c;
+  if(r===2&&c===2)return;
+  const number=showdownCards[cardIndex][c][r];
+
+  if(!showdownCalled.has(number)){
+    bingoLog.textContent='That number has not been called yet.';
+    sfx('bad');
+    return;
+  }
+
+  if(showdownMarks[cardIndex].has(key)){
+    showdownMarks[cardIndex].delete(key);
+  }else{
+    showdownMarks[cardIndex].add(key);
+    sfx('click');
+  }
+  renderBingoShowdown();
+}
+
+function callShowdownNumber(){
+  if(showdownCalled.size>=75){
+    stopBingoShowdown();
+    bingoLog.textContent='All numbers were called. Start a new showdown.';
+    return;
+  }
+  let n;
+  do{n=1+Math.floor(Math.random()*75)}while(showdownCalled.has(n));
+  showdownCalled.add(n);
+  showdownHistory.push(n);
+  const letter=n<=15?'B':n<=30?'I':n<=45?'N':n<=60?'G':'O';
+  bingoBall.textContent=letter+' '+n;
+  bingoCallerStatus.textContent='Called '+letter+' '+n+' — tap matching tiles on either card.';
+  bingoLog.textContent='Listen, find '+letter+' '+n+', and mark it yourself.';
+  speakBingo(letter+' '+n);
+  sfx('win');
+  renderBingoShowdown();
+}
+
+function toggleBingoShowdown(){
+  if(showdownRunning){
+    stopBingoShowdown();
+    return;
+  }
+  showdownRunning=true;
+  bingoCallerBtn.textContent='Pause Caller';
+  bingoCallerStatus.textContent='Showdown running';
+  callShowdownNumber();
+  showdownSeconds=4;
+  bingoTimer.textContent='0:04';
+
+  showdownTimer=setInterval(()=>{
+    showdownSeconds--;
+    if(showdownSeconds<=0){
+      callShowdownNumber();
+      showdownSeconds=4;
+    }
+    bingoTimer.textContent='0:'+String(showdownSeconds).padStart(2,'0');
+  },1000);
+}
+
+function stopBingoShowdown(){
+  showdownRunning=false;
+  if(showdownTimer){
+    clearInterval(showdownTimer);
+    showdownTimer=null;
+  }
+  if(window.bingoCallerBtn)bingoCallerBtn.textContent='Start Showdown';
+}
+
+function showdownHasLine(cardIndex){
+  const marks=showdownMarks[cardIndex];
+  const line=items=>items.every(([r,c])=>marks.has(r+'-'+c));
+  for(let r=0;r<5;r++)if(line(Array.from({length:5},(_,c)=>[r,c])))return true;
+  for(let c=0;c<5;c++)if(line(Array.from({length:5},(_,r)=>[r,c])))return true;
+  if(line(Array.from({length:5},(_,i)=>[i,i])))return true;
+  if(line(Array.from({length:5},(_,i)=>[i,4-i])))return true;
+  return false;
+}
+
+function claimBingoShowdown(){
+  const winner=showdownHasLine(0)||showdownHasLine(1);
+  if(!winner){
+    bingoLog.textContent='No completed Bingo line yet. Keep listening and marking.';
+    sfx('bad');
+    return;
+  }
+
+  stopBingoShowdown();
+  showdownWins++;
+  showdownStreak++;
+  bingoLog.textContent='BINGO! Cookie wins 350 coins. A new showdown starts shortly.';
+  bingoCallerStatus.textContent='BINGO WIN!';
+  speakBingo('Bingo! Cookie wins!');
+  sfx('enter');
+  sparks(50);
+  reward(350,45);
+  document.querySelector('.bingoShowdown').style.animation='winnerFlash .6s ease 3';
+
+  setTimeout(()=>{
+    document.querySelector('.bingoShowdown').style.animation='';
+    newBingoShowdown();
+  },2800);
+}
+
+function useBingoPowerShot(){
+  if(showdownPowerShots<=0){
+    bingoLog.textContent='No Power Shots remaining this showdown.';
+    sfx('bad');
+    return;
+  }
+  showdownPowerShots--;
+  let candidates=[];
+  showdownCards.forEach((card,cardIndex)=>{
+    for(let r=0;r<5;r++)for(let c=0;c<5;c++){
+      if(r===2&&c===2)continue;
+      const key=r+'-'+c,n=card[c][r];
+      if(showdownCalled.has(n)&&!showdownMarks[cardIndex].has(key)){
+        candidates.push({cardIndex,r,c});
+      }
+    }
+  });
+
+  if(!candidates.length){
+    bingoLog.textContent='Power Shot saved—there are no unmarked called tiles right now.';
+    showdownPowerShots++;
+  }else{
+    const pick=candidates[Math.floor(Math.random()*candidates.length)];
+    showdownMarks[pick.cardIndex].add(pick.r+'-'+pick.c);
+    bingoLog.textContent='Power Shot marked one called tile!';
+    sfx('crunch');
+    sparks(10);
+  }
+  renderBingoShowdown();
+}
+
+function speakBingo(text){
+  if(!('speechSynthesis' in window))return;
+  speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(text);u.rate=.82;u.pitch=1.08;u.volume=1;
+  const voices=speechSynthesis.getVoices();if(voices.length)u.voice=voices.find(v=>/zira|aria|jenny|samantha|female/i.test(v.name))||voices[0];
+  speechSynthesis.speak(u)
+}
+
+
+
+let bingoNums=[],bingoCalled=new Set(),bingoMarks=new Set(),bingoCallN=0;
+function openBingo(){
+  requestGameEntry('bingo',()=>{
+    show('bingo');
+    newBingoShowdown();
+  });
+}
+
+
+
+
+
+
+/* ===== WORD PUZZLE ===== */
+let wordSize=9,wordLevelN=1,wordWords=[],wordLetters=[],wordSel=[],wordFoundSet=new Set(),wordStart=0,wordTimer=null,wordPlaced=[];
+const wordBank=['COOKIE','SWEET','CASINO','ARCADE','SPADES','BINGO','LUCKY','WINNER','JACKPOT','DOMINO','CHESS','CANDY'];
+function openWordPuzzle(){requestGameEntry('word',()=>{show('word');newWordPuzzle()})}
+function newWordPuzzle(){
+  wordSize=Math.min(13,8+wordLevelN);wordWords=[...wordBank].sort(()=>Math.random()-.5).slice(0,Math.min(9,4+wordLevelN));wordLetters=Array(wordSize*wordSize).fill(null);wordPlaced=[];wordFoundSet=new Set();wordSel=[];
+  const dirs=[[0,1],[1,0],[1,1],[-1,1]];
+  wordWords.forEach(w=>{
+    let placed=false;
+    for(let tries=0;tries<200&&!placed;tries++){
+      let [dr,dc]=rand(dirs),r=Math.floor(Math.random()*wordSize),c=Math.floor(Math.random()*wordSize);
+      let er=r+dr*(w.length-1),ec=c+dc*(w.length-1);
+      if(er<0||er>=wordSize||ec<0||ec>=wordSize)continue;
+      let ok=true;for(let i=0;i<w.length;i++){let idx=(r+dr*i)*wordSize+c+dc*i;if(wordLetters[idx]&&wordLetters[idx]!==w[i])ok=false}
+      if(ok){let cells=[];for(let i=0;i<w.length;i++){let x=(r+dr*i)*wordSize+c+dc*i;wordLetters[x]=w[i];cells.push(x)}wordPlaced.push({word:w,cells});placed=true}
+    }
+  });
+  for(let i=0;i<wordLetters.length;i++)if(!wordLetters[i])wordLetters[i]=String.fromCharCode(65+Math.floor(Math.random()*26));
+  wordStart=Date.now();clearInterval(wordTimer);wordTimer=setInterval(drawWordTime,1000);drawWord();
+}
+function drawWord(){
+  wordGrid.className='wordGrid wordTheme'+(((wordLevelN-1)%5)+1);wordGrid.style.gridTemplateColumns='repeat('+wordSize+',1fr)';wordGrid.innerHTML='';
+  wordLetters.forEach((l,i)=>{let e=document.createElement('div');e.className='wordCell'+(wordSel.includes(i)?' selected':'')+(cellInFound(i)?' found':'');e.textContent=l;e.onclick=()=>pickWordCell(i);wordGrid.appendChild(e)});
+  wordList.innerHTML='';wordWords.forEach(w=>{let e=document.createElement('span');e.className='wordTag'+(wordFoundSet.has(w)?' found':'');e.textContent=w;wordList.appendChild(e)});
+  wordFound.textContent=wordFoundSet.size;
+}
+function cellInFound(i){return false}
+function pickWordCell(i){
+  if(!wordSel.length){wordSel=[i];tone(520,.05,'triangle',.04)}
+  else{
+    let first=wordSel[0],fr=Math.floor(first/wordSize),fc=first%wordSize,r=Math.floor(i/wordSize),c=i%wordSize,dr=Math.sign(r-fr),dc=Math.sign(c-fc);
+    if(!((dr===0)||(dc===0)||(Math.abs(r-fr)===Math.abs(c-fc)))){wordSel=[i];drawWord();return}
+    wordSel=[];let rr=fr,cc=fc;
+    while(true){wordSel.push(rr*wordSize+cc);if(rr===r&&cc===c)break;rr+=dr;cc+=dc}
+    let made=wordSel.map(x=>wordLetters[x]).join(''),rev=[...made].reverse().join('');
+    let found=wordWords.find(w=>!wordFoundSet.has(w)&&(w===made||w===rev));
+    if(found){tone(660,.08,'triangle',.05);tone(880,.10,'triangle',.05,.08);wordFoundSet.add(found);wordLog.textContent='Found '+found+'!';reward(40,8);sfx('win');sparks(8);wordSel=[]}
+  }
+  drawWord();
+  if(wordFoundSet.size===wordWords.length){toast('LEVEL '+wordLevelN+' COMPLETE!');reward(300+wordLevelN*40,45);sfx('enter');sparks(28);wordLevelN++;setTimeout(newWordPuzzle,2200)}
+}
+
+function wordPuzzleHint(){
+  let target=wordPlaced.find(x=>!wordFoundSet.has(x.word));
+  if(!target){toast('No hint needed');return}
+  let cell=wordGrid.children[target.cells[0]];
+  if(cell){cell.classList.add('wordHintGlow');setTimeout(()=>cell.classList.remove('wordHintGlow'),2500)}
+  wordLog.textContent='Hint: '+target.word+' starts with '+target.word[0]+'.';
+  tone(880,.08,'triangle',.05);tone(1174,.09,'triangle',.04,.08);
+}
+
+function clearWordSelection(){wordSel=[];drawWord()}
+function drawWordTime(){if(wordStart){let s=Math.floor((Date.now()-wordStart)/1000);wordTime.textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}}
+
+/* ===== CHESS ===== */
+let chess=[],chessSide='white',chessSel=null,chessMoves=[],chessCap=0;
+const chessPieces={r:'♜',n:'♞',b:'♝',q:'♛',k:'♚',p:'♟',R:'♖',N:'♘',B:'♗',Q:'♕',K:'♔',P:'♙'};
+function openChess(){requestGameEntry('chess',()=>{show('chess');newChess()})}
+function newChess(){
+ chess=['r','n','b','q','k','b','n','r',...Array(8).fill('p'),...Array(32).fill(''),...Array(8).fill('P'),'R','N','B','Q','K','B','N','R'];
+ chessSide='white';chessSel=null;chessMoves=[];chessCap=0;drawChess();chessLog.textContent='White moves first.';
+}
+function pieceWhite(p){return p&&p===p.toUpperCase()}
+function chessLegal(i){
+ let p=chess[i],r=Math.floor(i/8),c=i%8,out=[],white=pieceWhite(p),type=p.toLowerCase();
+ const add=(rr,cc)=>{if(rr>=0&&rr<8&&cc>=0&&cc<8){let x=rr*8+cc;if(!chess[x]||pieceWhite(chess[x])!==white)out.push(x);return !chess[x]}return false};
+ if(type==='p'){let d=white?-1:1;if(add(r+d,c)&&((white&&r===6)||(!white&&r===1)))add(r+2*d,c);[[d,-1],[d,1]].forEach(([dr,dc])=>{let rr=r+dr,cc=c+dc;if(rr>=0&&rr<8&&cc>=0&&cc<8){let x=rr*8+cc;if(chess[x]&&pieceWhite(chess[x])!==white)out.push(x)}})}
+ if(type==='n')[[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]].forEach(v=>add(r+v[0],c+v[1]));
+ if(type==='k')for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++)if(dr||dc)add(r+dr,c+dc);
+ if('rbq'.includes(type)){let ds=[];if('rq'.includes(type))ds.push([1,0],[-1,0],[0,1],[0,-1]);if('bq'.includes(type))ds.push([1,1],[1,-1],[-1,1],[-1,-1]);ds.forEach(([dr,dc])=>{let rr=r+dr,cc=c+dc;while(add(rr,cc)){rr+=dr;cc+=dc}})}
+ return out;
+}
+function drawChess(){
+ chessTurn.textContent=chessSide==='white'?'White':'Black';chessCaptured.textContent=chessCap;chessBoard.innerHTML='';
+ chess.forEach((p,i)=>{let r=Math.floor(i/8),c=i%8,e=document.createElement('div');e.className='chessCell '+((r+c)%2?'dark':'light')+(p?(pieceWhite(p)?' whitePiece':' blackPiece'):'')+(chessSel===i?' selected':'')+(chessMoves.includes(i)?' move':'');e.textContent=chessPieces[p]||'';e.onclick=()=>clickChess(i);chessBoard.appendChild(e)})
+}
+function clickChess(i){
+ let p=chess[i];
+ if(chessSel===null){
+   if(!p||pieceWhite(p)!==(chessSide==='white'))return;
+   chessSel=i;chessMoves=chessLegal(i);drawChess();return;
+ }
+ if(chessMoves.includes(i)){
+   if(chess[i]){chessCap++;tone(140,.12,'square',.07);tone(90,.18,'sawtooth',.05,.05)}else{tone(420,.06,'triangle',.05)}chess[i]=chess[chessSel];chess[chessSel]='';chessSide=chessSide==='white'?'black':'white';sfx('card');chessLog.textContent='Move completed. '+(chessSide==='white'?'White':'Black')+' to play.';sfx('card');
+   chessSel=null;chessMoves=[];drawChess();
+   if(chessSide==='black')setTimeout(chessBot,700);
+ }else{chessSel=null;chessMoves=[];drawChess()}
+}
+function chessBot(){
+ let pieces=chess.map((p,i)=>({p,i})).filter(x=>x.p&&!pieceWhite(x.p));let options=[];
+ pieces.forEach(x=>chessLegal(x.i).forEach(m=>options.push([x.i,m])));
+ if(!options.length){toast('WHITE WINS CHESS!');reward(400,60);tone(90,.18,'sawtooth',.08);tone(523,.15,'triangle',.07,.12);tone(784,.18,'triangle',.07,.24);sparks(36);return}
+ let [a,b]=rand(options);if(chess[b]){chessCap++;tone(120,.12,'square',.07);tone(80,.18,'sawtooth',.05,.05)}else{tone(260,.06,'triangle',.05)}chess[b]=chess[a];chess[a]='';chessSide='white';tone(190,.08,'square',.04);chessLog.textContent='Bot moved. White to play.';sfx('card');drawChess();
+}
+
+/* ===== DOMINOES ===== */
+let dominoHandN=[],dominoBotN=[],dominoChainN=[],dominoPool=[],dominoWinsN=0,dominoCookieScoreN=0,dominoBotScoreN=0,dominoRoundN=1;
+let dominoBusyN=false;
+function allDominoes(){let a=[];for(let i=0;i<=6;i++)for(let j=i;j<=6;j++)a.push([i,j]);return a.sort(()=>Math.random()-.5)}
+function openDominoes(){requestGameEntry('dominoes',()=>{show('dominoes');newDominoes()})}
+function newDominoes(){
+  dominoBusyN=false;
+  const d=allDominoes();
+  dominoHandN=d.splice(0,7);
+  dominoBotN=d.splice(0,7);
+  dominoPool=d;
+  dominoChainN=[dominoPool.pop()];
+  drawDominoes();
+  dominoLog.textContent='YOUR TURN. Match the left or right open number.';
+  dominoTurn.textContent='YOUR TURN';
+  dominoTurn.classList.add('turnPulse');
+  dominoTurnOverlay.classList.remove('show');
+  dominoSlowPanel.textContent='Step 1: Read the two open numbers. Step 2: Click one glowing domino.';
+}
+function dominoHTML(d,cls=''){return '<div class="domino '+cls+'" style="background:linear-gradient(#fff8df,#d8f0ff);border-color:#74d7ff"><span>'+d[0]+'</span><span class="dominoLine"></span><span>'+d[1]+'</span></div>'}
+function canDomino(d){let l=dominoChainN[0][0],r=dominoChainN[dominoChainN.length-1][1];return d[0]===l||d[1]===l||d[0]===r||d[1]===r}
+function drawDominoes(){
+ dominoBotCount.textContent=dominoBotN.length;if(dominoChainN.length){dominoLeftEnd.textContent=dominoChainN[0][0];dominoRightEnd.textContent=dominoChainN[dominoChainN.length-1][1]}if(window.dominoTurn)dominoTurn.textContent='Your turn';dominoCount.textContent=dominoHandN.length;dominoWins.textContent=dominoWinsN;
+ dominoChain.innerHTML=dominoChainN.map((d,i)=>dominoHTML(d,'horizontal'+(i%2?' botDomino':''))).join('');
+ dominoHand.innerHTML='';dominoHandN.forEach((d,i)=>{let e=document.createElement('div');e.innerHTML=dominoHTML(d,canDomino(d)?'playable':'');e.firstChild.onclick=()=>playDomino(i);dominoHand.appendChild(e.firstChild)});
+}
+function playDomino(i){
+  if(dominoBusyN){
+    dominoLog.textContent='Please wait—the bot is still playing.';
+    return;
+  }
+
+  const d=dominoHandN[i];
+  const l=dominoChainN[0][0];
+  const r=dominoChainN[dominoChainN.length-1][1];
+  let placed=false;
+
+  if(d[1]===l){dominoChainN.unshift(d);placed=true}
+  else if(d[0]===l){dominoChainN.unshift([d[1],d[0]]);placed=true}
+  else if(d[0]===r){dominoChainN.push(d);placed=true}
+  else if(d[1]===r){dominoChainN.push([d[1],d[0]]);placed=true}
+
+  if(!placed){
+    dominoLog.textContent='That domino does not match '+l+' or '+r+'.';
+    sfx('bad');
+    return;
+  }
+
+  dominoHandN.splice(i,1);
+  sfx('card');
+  drawDominoes();
+
+  if(!dominoHandN.length){
+    dominoWinsN++;
+    dominoCookieScoreN+=100;
+    dominoLog.textContent='COOKIE WINS THE ROUND!';
+    reward(350,50);
+    sparks(30);
+    sfx('win');
+    dominoRoundN++;
+    setTimeout(newDominoes,2600);
+    return;
+  }
+
+  dominoBusyN=true;
+  dominoTurn.textContent='BOT TURN';
+  dominoTurn.classList.remove('turnPulse');
+  dominoTurnOverlay.textContent='BOT IS THINKING...';
+  dominoTurnOverlay.classList.add('show');
+  dominoSlowPanel.textContent='Watch the board. The bot will place one domino, then your turn returns.';
+  setTimeout(dominoBotTurn,4200);
+}
+function dominoBotTurn(){
+  let playable=dominoBotN.map((d,i)=>({d,i})).filter(x=>canDomino(x.d));
+  const index=playable.length
+    ? playable.sort((a,b)=>(b.d[0]+b.d[1])-(a.d[0]+a.d[1]))[0].i
+    : -1;
+
+  if(index<0){
+    if(dominoPool.length)dominoBotN.push(dominoPool.pop());
+    dominoLog.textContent='The bot could not match and drew one domino.';
+  }else{
+    const d=dominoBotN[index];
+    const l=dominoChainN[0][0],r=dominoChainN[dominoChainN.length-1][1];
+    if(d[1]===l)dominoChainN.unshift(d);
+    else if(d[0]===l)dominoChainN.unshift([d[1],d[0]]);
+    else if(d[0]===r)dominoChainN.push(d);
+    else dominoChainN.push([d[1],d[0]]);
+    dominoBotN.splice(index,1);
+    dominoLog.textContent='Bot played '+d[0]+'–'+d[1]+'. Now match '+dominoChainN[0][0]+' or '+dominoChainN[dominoChainN.length-1][1]+'.';
+    sfx('card');
+  }
+
+  drawDominoes();
+  dominoBusyN=false;
+  dominoTurnOverlay.classList.remove('show');
+  dominoTurn.textContent='YOUR TURN';
+  dominoTurn.classList.add('turnPulse');
+  dominoSlowPanel.textContent='YOUR TURN: choose one glowing domino. Take your time.';
+
+  if(!dominoBotN.length){
+    dominoBotScoreN+=100;
+    dominoLog.textContent='BOT WON THIS ROUND.';
+    sfx('bad');
+    dominoRoundN++;
+    setTimeout(newDominoes,2600);
+  }
+}
+function drawDomino(){if(dominoPool.length){dominoHandN.push(dominoPool.pop());drawDominoes();sfx('card')}else toast('No dominoes left')}
+
+
+window.addEventListener("DOMContentLoaded", initPlayerCloud);
+</script>
+</body>
+</html>

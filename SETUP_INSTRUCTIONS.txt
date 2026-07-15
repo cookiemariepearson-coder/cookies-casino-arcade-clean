@@ -1,0 +1,69 @@
+COOKIE'S CASINO ARCADE — COMPLETE ENTER FIX PACKAGE
+
+THIS IS A FULL GITHUB/VERCEL PACKAGE
+Upload the contents of this folder to the root of your GitHub repository.
+
+REQUIRED ROOT ITEMS
+api/
+audio/
+lib/
+index.html
+package.json
+vercel.json
+supabase_setup.sql
+.env.example
+
+SUPABASE VARIABLES IN VERCEL
+SUPABASE_URL
+SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY
+
+PUBLIC URL VARIABLE
+PUBLIC_SITE_URL=https://cookies-casino-arcade.vercel.app
+
+STRIPE VARIABLES
+STRIPE_SECRET_KEY
+STRIPE_WEBHOOK_SECRET
+STRIPE_PRICE_STARTER
+STRIPE_PRICE_PLAYER
+STRIPE_PRICE_HIGH_ROLLER
+STRIPE_PRICE_VIP
+
+AFTER UPLOADING
+1. Commit all files in GitHub.
+2. Wait for Vercel to redeploy.
+3. Confirm the newest deployment is Ready and Production.
+4. Open the arcade.
+5. Press Ctrl + Shift + R.
+6. Click ENTER.
+7. Sign in with the confirmed Supabase account.
+
+IMPORTANT
+Do not upload the ZIP itself as the only GitHub file.
+Extract the ZIP and upload all folders and files inside it.
+
+
+STARTER COINS UPDATE
+Run the updated supabase_setup.sql again in Supabase SQL Editor.
+It gives new players 10,000 starter Cookie Coins.
+It also gives 10,000 starter coins to existing accounts that have no wallet transaction history.
+
+PLAYER ENTRY
+Players must press ENTER after the account is recognized.
+That click also unlocks browser music and sound.
+
+COIN STORE PROMPTS
+The arcade displays Buy Coins:
+- every time the signed-in player presses ENTER,
+- when the balance reaches 1,000 coins or less,
+- when the player has no coins,
+- when a game entry fails because of insufficient coins.
+
+
+GAMEPLAY ANIMATION REBUILD
+- Added Spades watchdog protection.
+- Corrected Solitaire board/waste rendering.
+- Added visible Color Clash turn and played-card feedback.
+- Rebuilt Bingo as a two-card automatic-caller showdown with manual marking.
+- Slowed Domino House and added large turn overlays.
+- Added animated coin deductions and rewards.

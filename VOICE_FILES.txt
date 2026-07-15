@@ -1,0 +1,13 @@
+Optional natural voice files can be placed inside audio/voices.
+
+Suggested filenames:
+card_had_somewhere.mp3
+beat_that.mp3
+not_playing.mp3
+really_played_that.mp3
+got_something.mp3
+partner_i_see_you.mp3
+dont_celebrate.mp3
+still_got_cards.mp3
+bingo_win.mp3
+game_win.mp3
