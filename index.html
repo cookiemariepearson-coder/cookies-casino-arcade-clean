@@ -1706,6 +1706,11 @@ window.addEventListener('beforeunload',clearAllGameTimers);
   100%{opacity:0;transform:translate(-50%,-70%) scale(1.25)}
 }
 
+
+#enterArcadeBtn:disabled{opacity:.75;cursor:wait}
+body.arcadeOpen #start{display:none!important;pointer-events:none!important}
+body.arcadeOpen #app{display:block!important}
+
 </style>
 </head>
 <body>
@@ -1835,7 +1840,7 @@ window.addEventListener('beforeunload',clearAllGameTimers);
   </div>
 </div>
 
-<div id="start"><div class="startBox"><div class="logo">Cookie's Casino<span>Arcade</span></div><p>Spades, Solitaire, UNO-style cards, and Cookie Crush in one direct-open arcade.</p><button onclick="startPlayerFlow()">🎰 ENTER</button><div style="margin-top:10px"><span class="cloudStatus" id="startCloudStatus">Connecting to secure player system...</span></div></div></div>
+<div id="start"><div class="startBox"><div class="logo">Cookie's Casino<span>Arcade</span></div><p>Spades, Solitaire, UNO-style cards, and Cookie Crush in one direct-open arcade.</p><button id="enterArcadeBtn" type="button">ENTER</button><span id="startCloudStatus" style="display:none"></span></div></div>
 <div id="toast" class="toast"></div>
 <span id="cloudStatus" style="display:none"></span><span id="xp" style="display:none">0</span>
 <div id="app" class="app">
@@ -2377,24 +2382,33 @@ async function applyAuthSession(session){
   }
   await refreshPlayerAccount();
 
-  // After email confirmation or session restoration, enter automatically.
   setCloudStatus('Account ready — press ENTER','online');
 }
 
 async function startPlayerFlow(){
+  const enterButton=document.getElementById('enterArcadeBtn');
+
   try{
-    if(!supabaseClient){
-      setCloudStatus('Connecting...','');
-      await initPlayerCloud();
+    if(enterButton){
+      enterButton.disabled=true;
+      enterButton.textContent='ENTERING...';
     }
 
-    if(!currentUser && supabaseClient){
-      const result=await supabaseClient.auth.getSession();
+    // Restore an existing session if the user was already confirmed.
+    if(!currentUser&&supabaseClient){
+      const result=await Promise.race([
+        supabaseClient.auth.getSession(),
+        new Promise((_,reject)=>setTimeout(
+          ()=>reject(new Error('Session check timed out. Please sign in again.')),
+          5000
+        ))
+      ]);
+
       if(result.error)throw result.error;
+
       if(result.data?.session){
         currentSession=result.data.session;
         currentUser=result.data.session.user;
-        await refreshPlayerAccount();
       }
     }
 
@@ -2403,15 +2417,41 @@ async function startPlayerFlow(){
       return;
     }
 
-    // Browsers only allow music and sound after a real player click.
+    // Open the arcade first. Audio, account refresh, and effects must never block entry.
     closeAuthModal();
-    await activateArcadeAudio();
     openArcadeScreen();
-    setTimeout(showEntryCoinOffer,250);
+
+    // Start sound after the real ENTER click, but do not wait for it.
+    Promise.resolve(activateArcadeAudio()).catch(error=>{
+      console.warn('Audio startup did not block entry:',error);
+    });
+
+    // Refresh the secure wallet in the background.
+    Promise.resolve(refreshPlayerAccount())
+      .then(()=>{
+        render();
+        setTimeout(showEntryCoinOffer,350);
+      })
+      .catch(error=>{
+        console.warn('Wallet refresh did not block entry:',error);
+        setTimeout(showEntryCoinOffer,350);
+      });
+
   }catch(error){
-    console.error(error);
-    openAuthModal('login');
-    authMessage.textContent=error.message||'Please sign in.';
+    console.error('Enter error:',error);
+    if(!currentUser){
+      openAuthModal('login');
+      authMessage.textContent=error.message||'Please sign in.';
+    }else{
+      // Even if a secondary service fails, a signed-in player still enters.
+      closeAuthModal();
+      openArcadeScreen();
+    }
+  }finally{
+    if(enterButton){
+      enterButton.disabled=false;
+      enterButton.textContent='ENTER';
+    }
   }
 }
 
@@ -2580,20 +2620,29 @@ function createMegaCoinStorm(){
 }
 
 function openArcadeScreen(){
-  closeAuthModal();
-  closeEntryCoinOffer();
+  try{closeAuthModal()}catch(error){}
+  try{closeEntryCoinOffer()}catch(error){}
 
-  const startScreen=$('start');
-  const appScreen=$('app');
+  const startScreen=document.getElementById('start');
+  const appScreen=document.getElementById('app');
 
-  if(startScreen)startScreen.style.display='none';
-  if(appScreen)appScreen.style.display='block';
+  if(startScreen){
+    startScreen.style.setProperty('display','none','important');
+    startScreen.setAttribute('aria-hidden','true');
+  }
 
-  try{sfx('enter')}catch(error){}
+  if(appScreen){
+    appScreen.style.setProperty('display','block','important');
+    appScreen.removeAttribute('aria-hidden');
+  }
+
+  document.body.classList.add('arcadeOpen');
+  window.scrollTo({top:0,behavior:'auto'});
+
+  try{render()}catch(error){console.warn('Render warning:',error)}
   try{toast("Welcome to Cookie's Casino Arcade!")}catch(error){}
   try{createMegaCoinStorm()}catch(error){}
   try{casinoAmbience()}catch(error){}
-  try{render()}catch(error){console.warn(error)}
   try{checkCheckoutReturn()}catch(error){}
 }
 
@@ -4623,6 +4672,23 @@ function drawDomino(){if(dominoPool.length){dominoHandN.push(dominoPool.pop());d
 
 
 window.addEventListener("DOMContentLoaded", initPlayerCloud);
+
+
+function bindEnterArcadeButton(){
+  const button=document.getElementById('enterArcadeBtn');
+  if(!button||button.dataset.bound==='true')return;
+  button.dataset.bound='true';
+  button.addEventListener('click',event=>{
+    event.preventDefault();
+    event.stopPropagation();
+    startPlayerFlow();
+  });
+}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  bindEnterArcadeButton();
+  initPlayerCloud();
+});
 </script>
 </body>
 </html>

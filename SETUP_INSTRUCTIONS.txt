@@ -83,3 +83,10 @@ COIN BALANCE + GLITCH FIX
 - Repeated game intervals are cleared before restarting.
 - Bingo design remains unchanged.
 - Casino entrance now launches a large animated Cookie Coin shower.
+
+
+ENTER IMMEDIATE FIX
+- ENTER now opens the arcade before audio or wallet requests can delay it.
+- The entrance Cloud Saved message is hidden.
+- The ENTER button has a direct event listener and loading state.
+- Audio, wallet refresh, coin offer, and effects start after entry and cannot block it.
